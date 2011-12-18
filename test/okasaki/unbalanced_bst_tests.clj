@@ -1,5 +1,5 @@
-(ns okasaki.bs-tree-tests
-    (:use okasaki.bs-tree)
+(ns okasaki.unbalanced-bst-tests
+    (:use okasaki.unbalanced-bst)
     (:use midje.sweet))
     
 (fact "empty tree"
