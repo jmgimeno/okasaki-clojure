@@ -2,7 +2,8 @@
     (:use [clojure.core.match :only [match]])
     (:use okasaki.adt))
 
-(defcons 
+(defadt 
+    ::BST     ; name
     E         ; empty tree
     (T a x b) ; tree with root x, left subtree a and right subtree b
 )

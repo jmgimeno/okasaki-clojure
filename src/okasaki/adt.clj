@@ -2,25 +2,29 @@
 
 ;; Inspired by Konrad Hinsen's clojure.contrib.types
 
-(defn- make-tag
+(defn symbol-to-keyword
     [s]
     (keyword (str *ns*) (str s)))
 
-(defn- make-constructor
-    [constructor]
+(defn make-constructor
+    [type constructor]
     (if (symbol? constructor)
-        `(def ~constructor ~(make-tag constructor))
+        `(def 
+            ~constructor 
+            ~(symbol-to-keyword constructor))
         (let [[name & args] constructor]
-            `(defn ~name [~@args]
-                [~(make-tag name) ~@args]))))
+            `(defn
+                ~name 
+                [~@args] 
+                [~(symbol-to-keyword name) ~@args]))))
 
-(defmacro defcons
-    [& constructors]
+(defmacro defadt
+    [type & constructors]
     `(do
-        ~@(map make-constructor constructors)))
+        ~@(map (partial make-constructor type) constructors)))
         
 (defmacro defeqs
     [name args & eqs]
     `(defn ~name ~args
-        (~'match [~(make-tag name) ~@args]
+        (~'match [~(symbol-to-keyword name) ~@args]
             ~@eqs)))
