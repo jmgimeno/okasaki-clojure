@@ -7,12 +7,14 @@
     [s]
     (keyword (str *ns*) (str s)))
 
-(defn- constructor-name [constructor]
+(defn- constructor-name 
+    [constructor]
     (if (symbol? constructor) 
         constructor 
         (first constructor)))
 
-(defn- constructor-value [constructor]
+(defn- constructor-value 
+    [constructor]
     (if (symbol? constructor)
         (symbol-to-keyword constructor)
         (let [[name & args] constructor]
@@ -33,5 +35,5 @@
 (defmacro defun
     [name args & eqs]
     `(defn ~name ~args
-        (match [~(symbol-to-keyword name) ~@args]
+        (match ~args
             ~@eqs)))

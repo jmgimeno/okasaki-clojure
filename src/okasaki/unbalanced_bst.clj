@@ -8,18 +8,18 @@
 )
     
 (defun insert [x t]
-    [::insert x ::E] 
+    [x ::E] 
         (T E x E)
-    [::insert x ([::T a y b] :as s)]
+    [x ([::T a y b] :as s)]
         (cond 
             (< x y) (T (insert x a) y b)
             (< y x) (T a y (insert x b))
             :else   s))
 
 (defun member [x t]
-    [::member _ ::E]
+    [_ ::E]
         false
-    [::member x [::T a y b]]
+    [x [::T a y b]]
         (cond
             (< x y) (recur x a)
             (< y x) (recur x b)
