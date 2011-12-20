@@ -21,6 +21,6 @@
         false
     [::member x [::T a y b]]
         (cond
-            (< x y) (member x a)
-            (< y x) (member x b)
+            (< x y) (recur x a)
+            (< y x) (recur x b)
             :else   true))

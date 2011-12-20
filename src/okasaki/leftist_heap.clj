@@ -20,8 +20,10 @@
             (makeT y a2 (merge h1 b2))))
             
 (defun rank [h]
-    [::rank ::E]           0
-    [::rank [::T r _ _ _]] r)
+    [::rank ::E]           
+        0
+    [::rank [::T r _ _ _]] 
+        r)
     
 (defn makeT [x a b]
     (if (>= (rank a) (rank b))
@@ -32,7 +34,9 @@
     (merge (T 1 x E E) h))
     
 (defun findMin [h]
-    [::findMin [::T _ x _ _]] x)
+    [::findMin [::T _ x _ _]] 
+        x)
     
 (defun deleteMin [h]
-    [::deleteMin [::T _ _ a b]] (merge a b))
+    [::deleteMin [::T _ _ a b]] 
+        (merge a b))
