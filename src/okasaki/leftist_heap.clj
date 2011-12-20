@@ -2,14 +2,14 @@
     (:refer-clojure :exclude [merge])
     (:use ml.adt))
     
-(defadt
+(defdata
     ::LeftistHeap
     E
     (T r x a b))
 
 (declare merge rank makeT insert findMin deleteMin)
 
-(defequations merge [h1 h2]
+(defun merge [h1 h2]
     [::merge h ::E] 
         h
     [::merge ::E h]
@@ -19,7 +19,7 @@
             (makeT x a1 (merge b1 h2))
             (makeT y a2 (merge h1 b2))))
             
-(defequations rank [h]
+(defun rank [h]
     [::rank ::E]           0
     [::rank [::T r _ _ _]] r)
     
@@ -31,8 +31,8 @@
 (defn insert [x h]
     (merge (T 1 x E E) h))
     
-(defequations findMin [h]
+(defun findMin [h]
     [::findMin [::T _ x _ _]] x)
     
-(defequations deleteMin [h]
+(defun deleteMin [h]
     [::deleteMin [::T _ _ a b]] (merge a b))

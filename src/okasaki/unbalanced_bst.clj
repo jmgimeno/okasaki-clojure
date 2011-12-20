@@ -1,13 +1,13 @@
 (ns okasaki.unbalanced-bst
     (:use ml.adt))
 
-(defadt 
+(defdata 
     ::UnbalancedBST
     E         ; empty tree
     (T a x b) ; tree with root x, left subtree a and right subtree b
 )
     
-(defequations insert [x t]
+(defun insert [x t]
     [::insert x ::E] 
         (T E x E)
     [::insert x ([::T a y b] :as s)]
@@ -16,7 +16,7 @@
             (< y x) (T a y (insert x b))
             :else   s))
 
-(defequations member [x t]
+(defun member [x t]
     [::member _ ::E]
         false
     [::member x [::T a y b]]

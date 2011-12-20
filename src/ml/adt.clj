@@ -3,37 +3,35 @@
 
 ;; Inspired by Konrad Hinsen's clojure.contrib.types
 
-(defn symbol-to-keyword
+(defn- symbol-to-keyword
     [s]
     (keyword (str *ns*) (str s)))
 
-(defn make-constructor
-    [type constructor]
+(defn- constructor-name [constructor]
+    (if (symbol? constructor) 
+        constructor 
+        (first constructor)))
+
+(defn- constructor-value [constructor]
     (if (symbol? constructor)
-        `(defconstructor
-            ~type
-            ~constructor 
-            ~(symbol-to-keyword constructor))
+        (symbol-to-keyword constructor)
         (let [[name & args] constructor]
-            `(defconstructor
-                ~type
-                ~name 
-                [~@args] 
+            `(fn [~@args]
                 [~(symbol-to-keyword name) ~@args]))))
 
-(defmacro defconstructor
-    ([type name expr]
-        `(def ~(with-meta name (assoc (meta name) ::adt type)) ~expr))
-    ([type name args body]
-        `(defn ~(with-meta name (assoc (meta name) ::adt type)) ~args ~body)))
+(defn- make-constructor
+    [type constructor]
+    (let [name  (constructor-name constructor)
+          value (constructor-value constructor)]
+          `(def ~(with-meta name {::adt type}) ~value)))
 
-(defmacro defadt
+(defmacro defdata
     [type & constructors]
     `(do
         ~@(map (partial make-constructor type) constructors)))
         
-(defmacro defequations
+(defmacro defun
     [name args & eqs]
     `(defn ~name ~args
-        (clojure.core.match/match [~(symbol-to-keyword name) ~@args]
+        (match [~(symbol-to-keyword name) ~@args]
             ~@eqs)))
