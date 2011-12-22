@@ -1,25 +1,24 @@
 (ns okasaki.unbalanced-bst
-    (:use ml.adt))
+    (:use ml.datatype))
 
-(defdata 
+(defdatatype
     ::UnbalancedBST
-    E         ; empty tree
-    (T a x b) ; tree with root x, left subtree a and right subtree b
-)
+    Empty         ; empty tree
+    (Node a x b)) ; tree with root x, left subtree a and right subtree b
     
 (defun insert [x t]
-    [x ::E] 
-        (T E x E)
-    [x ([::T a y b] :as s)]
+    [x Empty] 
+        (Node Empty x Empty)
+    [x ([Node a y b] :as s)]
         (cond 
-            (< x y) (T (insert x a) y b)
-            (< y x) (T a y (insert x b))
+            (< x y) (Node (insert x a) y b)
+            (< y x) (Node a y (insert x b))
             :else   s))
 
 (defun member [x t]
-    [_ ::E]
+    [_ Empty]
         false
-    [x [::T a y b]]
+    [x [Node a y b]]
         (cond
             (< x y) (recur x a)
             (< y x) (recur x b)

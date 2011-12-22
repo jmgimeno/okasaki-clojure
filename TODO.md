@@ -1,5 +1,6 @@
-* Use only the paramenters in the pattern equations 
-* In the bst example, use recur when possible
-* Automate translation from constructor to ::constructor in the equation part of pattern
-* Error checking
-* Change midje to clojure.test (to experiment with it)
+* Better error checking and more tests
+* More examples
+* Add a case macro to allow more patter matching on the expression side
+* Lazyness
+* Allow for private datatypes and funs
+

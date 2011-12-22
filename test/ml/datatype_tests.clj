@@ -1,0 +1,21 @@
+(ns ml.datatype-tests
+    (:use ml.datatype)
+    (:use clojure.test))
+
+(defdatatype ::type expr (ctor arg1 arg2))
+
+(deftest empty-constructor-returns-keyword-in-current-namespace
+    (is (= ::expr expr)))
+
+(deftest non-empty-constructor-returns-vector
+    (is (= [::ctor 'x 'y] (ctor 'x 'y))))
+
+(deftest constructors-have-the-right-metadata
+    (is (= ::type (:ml.datatype/datatype (meta #'expr))))
+    (is (= ::type (:ml.datatype/datatype (meta #'ctor)))))
+
+(deftest we-can-detect-if-a-symbol-is-a-constructor
+    (is (constructor? 'ml.datatype-tests/expr))
+    (is (constructor? 'ml.datatype-tests/ctor))
+    (is (not (constructor? (gensym)))))
+

@@ -1,5 +1,6 @@
-(ns ml.adt
-    (:use [clojure.core.match :only [match]]))
+(ns ml.datatype
+    (:use [clojure.core.match :only [match]]
+          [clojure.walk :only [postwalk]]))
 
 ;; Inspired by Konrad Hinsen's clojure.contrib.types
 
@@ -13,7 +14,7 @@
         constructor 
         (first constructor)))
 
-(defn- constructor-value 
+(defn- constructor-value
     [constructor]
     (if (symbol? constructor)
         (symbol-to-keyword constructor)
@@ -25,15 +26,24 @@
     [type constructor]
     (let [name  (constructor-name constructor)
           value (constructor-value constructor)]
-          `(def ~(with-meta name {::adt type}) ~value)))
+          `(def ~(with-meta name {::datatype type}) ~value)))
 
-(defmacro defdata
+(defmacro defdatatype
     [type & constructors]
     `(do
         ~@(map (partial make-constructor type) constructors)))
-        
+
+(defn constructor? [s]
+    (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
+    
+(defn- transform-pattern [pattern]
+    (postwalk #(if (constructor? %) (symbol-to-keyword %) %) pattern))
+
+(defn- transform-rules [defs]
+    (mapcat (fn [[pattern expr]] [(transform-pattern pattern) expr]) (partition 2 defs)))
+
 (defmacro defun
-    [name args & eqs]
+    [name args & rules]
     `(defn ~name ~args
         (match ~args
-            ~@eqs)))
+            ~@(transform-rules rules))))
