@@ -33,23 +33,27 @@
     `(do
         ~@(map (partial make-constructor type) constructors)))
 
-(defn constructor? [s]
+(defn- constructor?
+    [s]
     (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
     
-(defn- transform-pattern [pattern]
+(defn- transform-row
+    [pattern]
     (postwalk #(if (constructor? %) (symbol-to-keyword %) %) pattern))
 
-(defn- transform-rules [defs]
-    (mapcat (fn [[pattern expr]] [(transform-pattern pattern) expr]) (partition 2 defs)))
-
-
 (defmacro caseof
-    [args & rules]
-    `(match ~args
-	    ~@(transform-rules rules)))
+    [occurrences & rules]
+    (let [row-action-pairs  (partition 2 rules)
+          rows              (map first  row-action-pairs)
+          actions           (map second row-action-pairs)
+          transformed-rows  (map transform-row rows)
+          transformed-rules (interleave transformed-rows actions)]
+        `(match ~occurrences
+                ~@transformed-rules)))
 
 (defmacro defun
     [name args & rules]
     `(defn ~name ~args
-        (caseof ~args
-		~@rules)))
+         (caseof ~args
+                 ~@rules)))
+

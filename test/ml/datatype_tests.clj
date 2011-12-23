@@ -14,11 +14,6 @@
     (is (= ::type (:ml.datatype/datatype (meta #'expr))))
     (is (= ::type (:ml.datatype/datatype (meta #'ctor)))))
 
-(deftest we-can-detect-if-a-symbol-is-a-constructor
-    (is (constructor? 'ml.datatype-tests/expr))
-    (is (constructor? 'ml.datatype-tests/ctor))
-    (is (not (constructor? (gensym)))))
-
 (deftest case-of-works-properly
     (let [test #(caseof [%] [expr] 0 [[ctor x y]] (+ x y))]
 	(is (= 0 (test expr)))
