@@ -19,3 +19,9 @@
     (is (constructor? 'ml.datatype-tests/ctor))
     (is (not (constructor? (gensym)))))
 
+(deftest case-of-works-properly
+    (let [test #(caseof [%] [expr] 0 [[ctor x y]] (+ x y))]
+	(is (= 0 (test expr)))
+	(is (= 3 (test (ctor 1 2))))))
+
+

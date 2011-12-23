@@ -42,8 +42,14 @@
 (defn- transform-rules [defs]
     (mapcat (fn [[pattern expr]] [(transform-pattern pattern) expr]) (partition 2 defs)))
 
+
+(defmacro caseof
+    [args & rules]
+    `(match ~args
+	    ~@(transform-rules rules)))
+
 (defmacro defun
     [name args & rules]
     `(defn ~name ~args
-        (match ~args
-            ~@(transform-rules rules))))
+        (caseof ~args
+		~@rules)))
