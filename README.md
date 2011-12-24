@@ -1,5 +1,4 @@
- okasaki-clojure
- ===========
+# okasaki-clojure
 
 An implementation of some data structures described in Okasaki's book "Purely 
 Functional Data Structures".
@@ -34,4 +33,4 @@ and _functions_ using pattern matching over these trees as:
                 (< y x) (recur x b)
                 :else   true))
 
--- (c) Juan Manuel Gimeno Illa
+#### (c) Juan Manuel Gimeno Illa
