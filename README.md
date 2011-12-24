@@ -1,8 +1,37 @@
-# okasaki-clojure
+ okasaki-clojure
+ ===========
 
-An implementation of some data structures described in Okasaki's "Purely 
+An implementation of some data structures described in Okasaki's book "Purely 
 Functional Data Structures".
 
-I'm trying to use follow _almost directly_ the ML implementations by macros 
-defined in ml/datatype.clj that use David Nolen's clojure.core.match library.
+I'm trying to follow _almost directly_ the ML implementations using some sugar on David Nolen's [core.match]
+(https://github.com/clojure/core.match) library.
 
+For instance, a _datatype_ for unbalanced binary search trees can be defined as:
+
+    (defdatatype
+        ::UnbalancedBST
+        Empty        
+        (Node a x b)) 
+
+and _functions_ using pattern matching over these trees as:
+
+    (defun insert [x t]
+        [x Empty] 
+            (Node Empty x Empty)
+        [x ([Node a y b] :as s)]
+            (cond 
+                (< x y) (Node (insert x a) y b)
+                (< y x) (Node a y (insert x b))
+                :else   s))
+
+    (defun member [x t]
+        [_ Empty]
+            false
+        [x [Node a y b]]
+            (cond
+                (< x y) (recur x a)
+                (< y x) (recur x b)
+                :else   true))
+
+-- (c) Juan Manuel Gimeno Illa
