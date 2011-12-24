@@ -19,4 +19,16 @@
 	(is (= 0 (test expr)))
 	(is (= 3 (test (ctor 1 2))))))
 
+(deflazy ::lazy lexpr (lctor arg1 arg2))
 
+(deftest empty-constructor-returns-delayed-keyword-in-current-namespace
+    (is (delay? lexpr))
+    (is (= ::lexpr (force lexpr))))
+
+(deftest non-empty-constructor-returns-delayed-vector
+    (is (delay? (lctor 'x 'y)))
+    (is (= [::lctor 'x 'y] (force (lctor 'x 'y)))))
+
+(deftest we-can-detect-lazy-patterns
+    (is (lazy? `lexpr))
+    (is (lazy? `[lctor x y])))
