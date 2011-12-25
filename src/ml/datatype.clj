@@ -9,30 +9,19 @@
     [s]
     (keyword (str *ns*) (str s)))
 
-(defn- constructor-name 
-    [constructor]
-    (if (symbol? constructor) 
-        constructor 
-        (first constructor)))
-
-(defn- constructor-value
-    [constructor]
-    (if (symbol? constructor)
-        (symbol-to-keyword constructor)
-        (let [[name & args] constructor]
-            `(fn [~@args]
-                [~(symbol-to-keyword name) ~@args]))))
-
-(defn- make-constructor
+(defn- make-constructor-eager
     [type constructor]
-    (let [name  (constructor-name constructor)
-          value (constructor-value constructor)]
-          `(def ~(with-meta name {::datatype type}) ~value)))
+    (if (symbol? constructor)
+        `(def ~(with-meta constructor {::datatype type})
+             ~(symbol-to-keyword constructor))
+        (let [[name & args] constructor]
+            `(defn ~(with-meta name {::datatype type}) [~@args]
+                 [~(symbol-to-keyword name) ~@args]))))
 
 (defmacro defdatatype
     [type & constructors]
     `(do
-        ~@(map (partial make-constructor type) constructors)))
+        ~@(map (partial make-constructor-eager type) constructors)))
 
 (defn- make-constructor-lazy
     [type constructor]
