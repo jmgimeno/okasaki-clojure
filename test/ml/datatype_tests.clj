@@ -2,6 +2,11 @@
     (:use ml.datatype)
     (:use clojure.test))
 
+(defmacro with-private-fns [[ns fns] & tests]
+  "Refers private fns from ns and runs tests in context."
+  `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
+       ~@tests))
+
 (defdatatype ::type expr (ctor arg1 arg2))
 
 (deftest empty-constructor-returns-keyword-in-current-namespace
@@ -14,7 +19,7 @@
     (is (= ::type (:ml.datatype/datatype (meta #'expr))))
     (is (= ::type (:ml.datatype/datatype (meta #'ctor)))))
 
-(deftest case-of-works-properly
+(deftest caseof-works-properly
     (let [test #(caseof [%] [expr] 0 [[ctor x y]] (+ x y))]
 	(is (= 0 (test expr)))
 	(is (= 3 (test (ctor 1 2))))))
@@ -29,6 +34,12 @@
     (is (delay? (lctor 'x 'y)))
     (is (= [::lctor 'x 'y] (force (lctor 'x 'y)))))
 
-(deftest we-can-detect-lazy-patterns
-    (is (lazy? `lexpr))
-    (is (lazy? `[lctor x y])))
+(deftest caseof-works-properly-with-lazy
+    (let [test #(caseof [%] [lexpr] 0 [[lctor x y]] (+ x y))]
+	(is (= 0 (test lexpr)))
+	(is (= 3 (test (lctor 1 2))))))
+
+(with-private-fns [ml.datatype [lazy?]]
+    (deftest we-can-detect-lazy-patterns
+        (is (lazy? `lexpr))
+        (is (lazy? `[lctor x y]))))
