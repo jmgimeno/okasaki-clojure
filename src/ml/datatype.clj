@@ -41,7 +41,7 @@
              (delay ~(symbol-to-keyword constructor)))
         (let [[name & args] constructor]
             `(defmacro ~(with-meta name {::datatype type ::lazy true}) [~@args]
-                 (list 'delay (into [~(symbol-to-keyword name)] [~@args]))))))
+                 (list 'delay [~(symbol-to-keyword name) ~@args])))))
 
 (defn- lazy?
     [pattern]
