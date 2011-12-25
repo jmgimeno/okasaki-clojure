@@ -52,24 +52,4 @@ and then, a function that returns the infinite stream of naturals
           ([]  (nats 0))
           ([n] (Cons n (nats (inc n)))))
 
-## Known problems
-
-When defining defuns the same symbol cannot appear both in the argument list and in the patterns. For instance:
-
-     user> (defdatatype ::Dummy (Pair x y))
-     #'user/Pair
-     user> (defun one [p] [[Pair p _]] p)
-     #'user/one
-     user> (one (Pair 1 2))
-     nil
-
-does not work (we use p both in ths arguments list and in the pattern). But
-
-     user> (defun one [pp] [[Pair p _]] p)
-     #'user/one
-     user> (one (Pair 1 2))
-     1
-
-works ok.
-
 #### (c) Juan Manuel Gimeno Illa
