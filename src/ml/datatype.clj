@@ -1,9 +1,6 @@
-
 (ns ml.datatype
     (:use [clojure.core.match :only [match]]
           [clojure.walk :only [postwalk]]))
-
-;; Inspired by Konrad Hinsen's clojure.contrib.types
 
 (defn- symbol-to-keyword
     [s]
@@ -12,40 +9,47 @@
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
-        `(def ~(with-meta constructor {::datatype type})
+        `(def ~(vary-meta  constructor assoc ::datatype type)
              ~(symbol-to-keyword constructor))
         (let [[name & args] constructor]
-            `(defn ~(with-meta name {::datatype type}) [~@args]
+            `(defn ~(vary-meta name assoc ::datatype type) [~@args]
                  [~(symbol-to-keyword name) ~@args]))))
-
-(defmacro defdatatype
-    [type & constructors]
-    `(do
-        ~@(map (partial make-constructor-eager type) constructors)))
 
 (defn- make-constructor-lazy
     [type constructor]
     (if (symbol? constructor)
-        `(def ~(with-meta constructor {::datatype type ::lazy true})
+        `(def ~(vary-meta  constructor assoc ::datatype type ::lazy true)
              (delay ~(symbol-to-keyword constructor)))
         (let [[name & args] constructor]
-            `(defmacro ~(with-meta name {::datatype type ::lazy true}) [~@args]
+            `(defmacro ~(vary-meta name assoc ::datatype type ::lazy true) [~@args]
                  (list 'delay [~(symbol-to-keyword name) ~@args])))))
 
-(defn- lazy?
-    [pattern]
-    (cond (symbol? pattern) (contains? (meta (resolve pattern)) ::lazy)
-          (vector? pattern) (lazy? (first pattern))))
-
-(defmacro deflazy
-    [type & constructors]
-    `(do
-         ~@(map (partial make-constructor-lazy type) constructors)))
+(defn- make-constructor
+    [type lazy constructor]
+    (if (or lazy (and (symbol? constructor) (::lazy (meta constructor)))
+                 (and (list? constructor) (symbol? (first constructor)) (::lazy (meta (first constructor)))))
+        (make-constructor-lazy type constructor)
+        (make-constructor-eager type constructor)))
 
 (defn- constructor?
     [s]
     (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
     
+(defn- lazy?
+    [pattern]
+    (cond (symbol? pattern) (::lazy (meta (resolve pattern)))
+          (vector? pattern) (lazy? (first pattern))))
+
+(defmacro defdatatype
+    [type & constructors]
+    `(do
+         ~@(map (partial make-constructor type false) constructors)))
+
+(defmacro deflazy
+    [type & constructors]
+    `(do
+         ~@(map (partial make-constructor type true) constructors)))
+
 (defn- transform-row
     [pattern]
     (postwalk #(if (constructor? %) (symbol-to-keyword %) %) pattern))
@@ -59,7 +63,7 @@
 (defmacro caseof
     [args & rules]
     (let [row-action-pairs  (partition 2 rules)
-          rows              (map first  row-action-pairs)
+          rows              (map first row-action-pairs)
           transposed-rows   (apply map vector rows)
           need-force        (map #(some lazy? %) transposed-rows)
           actions           (map second row-action-pairs)

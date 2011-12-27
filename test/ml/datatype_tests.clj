@@ -26,13 +26,19 @@
 
 (deflazy ::lazy lexpr (lctor arg1 arg2))
 
+(defdatatype ::lazy2 ^:ml.datatype/lazy lexpr2 (^:ml.datatype/lazy lctor2 arg1 arg2))
+
 (deftest empty-constructor-returns-delayed-keyword-in-current-namespace
     (is (delay? lexpr))
-    (is (= ::lexpr (force lexpr))))
+    (is (= ::lexpr (force lexpr)))
+    (is (delay? lexpr2))
+    (is (= ::lexpr2 (force lexpr2))))
 
 (deftest non-empty-constructor-returns-delayed-vector
     (is (delay? (lctor 'x 'y)))
-    (is (= [::lctor 'x 'y] (force (lctor 'x 'y)))))
+    (is (= [::lctor 'x 'y] (force (lctor 'x 'y))))
+    (is (delay? (lctor2 'x 'y)))
+    (is (= [::lctor2 'x 'y] (force (lctor2 'x 'y)))))
 
 (deftest caseof-works-properly-with-lazy
     (let [test #(caseof [%] [lexpr] 0 [[lctor x y]] (+ x y))]
@@ -42,4 +48,7 @@
 (with-private-fns [ml.datatype [lazy?]]
     (deftest we-can-detect-lazy-patterns
         (is (lazy? `lexpr))
-        (is (lazy? `[lctor x y]))))
+        (is (lazy? `[lctor x y]))
+        (is (lazy? `lexpr2))
+        (is (lazy? `[lctor2 x y]))))
+
