@@ -16,8 +16,8 @@
     (is (= [::ctor 'x 'y] (ctor 'x 'y))))
 
 (deftest constructors-have-the-right-metadata
-    (is (= ::type (:ml.datatype/datatype (meta #'expr))))
-    (is (= ::type (:ml.datatype/datatype (meta #'ctor)))))
+    (is (= ::type (:datatype (meta #'expr))))
+    (is (= ::type (:datatype (meta #'ctor)))))
 
 (deftest caseof-works-properly
     (let [test #(caseof [%] [expr] 0 [[ctor x y]] (+ x y))]
@@ -26,7 +26,7 @@
 
 (deflazy ::lazy lexpr (lctor arg1 arg2))
 
-(defdatatype ::lazy2 ^:ml.datatype/lazy lexpr2 (^:ml.datatype/lazy lctor2 arg1 arg2))
+(defdatatype ::lazy2 ^:lazy lexpr2 (^:lazy lctor2 arg1 arg2))
 
 (deftest empty-constructor-returns-delayed-keyword-in-current-namespace
     (is (delay? lexpr))
