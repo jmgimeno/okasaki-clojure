@@ -1,10 +1,10 @@
 (ns okasaki.streams
     (use ml.datatype))
 
-(deflazy
+(defdatatype
     ::Streams
     Nil
-    (Cons elem stream))
+    (^:lazy Cons elem stream))
 
 (defun s-first [stream]
     [[Cons x _]] x)

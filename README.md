@@ -6,9 +6,10 @@ Functional Data Structures".
 I'm trying to follow _almost directly_ the ML implementations using some sugar on David Nolen's [core.match]
 (https://github.com/clojure/core.match) library.
 
-## Eager datatypes
+## Datatypes
 
-These types are evaluated eagerly (as is ML, as far as I know).
+A datatype contains an object to name it, and a group of constructors
+with or without parameters.
 
 For instance, a _datatype_ for unbalanced binary search trees can be defined as:
 
@@ -37,19 +38,38 @@ and _functions_ using pattern matching over these trees as:
                 (< y x) (recur x b)
                 :else   true))
 
-## Lazy datatypes
+## Lazy constructors
 
-These types are evaluated lazyly. For instance, you can define a streas as:
+Some constructors can be lazy: they are evaluated only if needed. 
+
+To define a constructor as lazy, we associate the :lazy metadata
+as true with it.
+
+For instance, we can define the Streams type as
+
+    (defdatatype
+        ::Streams
+        Nil
+        ( ^:lazy Cons elem stream))
+
+which would define the Cons constructor to be lazy.
+
+Using it we can define a function that returns the infinite stream of naturals
+
+    (defn nats
+          ([]  (nats 0))
+          ([n] (Cons n (nats (inc n)))))
+          
+### deflazy
+
+When we want to define all the constructors of a datatype as lazy, we
+can use deflazy as a shortcut.
 
     (deflazy
         ::Streams
         Nil
         (Cons elem stream))
 
-and then, a function that returns the infinite stream of naturals
-
-    (defn nats
-          ([]  (nats 0))
-          ([n] (Cons n (nats (inc n)))))
+and now both constructors would be defined as lazy.
 
 #### (c) Juan Manuel Gimeno Illa
