@@ -45,10 +45,10 @@
 	(is (= 0 (test lexpr)))
 	(is (= 3 (test (lctor 1 2))))))
 
-(with-private-fns [ml.datatype [lazy?]]
+(with-private-fns [ml.datatype [lazy-pattern?]]
     (deftest we-can-detect-lazy-patterns
-        (is (lazy? `lexpr))
-        (is (lazy? `[lctor x y]))
-        (is (lazy? `lexpr2))
-        (is (lazy? `[lctor2 x y]))))
+        (is (lazy-pattern? `lexpr))
+        (is (lazy-pattern? `[lctor x y]))
+        (is (lazy-pattern? `lexpr2))
+        (is (lazy-pattern? `[lctor2 x y]))))
 

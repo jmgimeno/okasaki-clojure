@@ -24,10 +24,14 @@
             `(defmacro ~(vary-meta name assoc ::datatype type ::lazy true) [~@args]
                  (list 'delay [~(symbol-to-keyword name) ~@args])))))
 
+(defn- lazy-constructor?
+    [constructor]
+    (cond (symbol? constructor) (::lazy (meta constructor))
+          (list? constructor) (lazy-constructor? (first constructor))))
+    
 (defn- make-constructor
     [type lazy constructor]
-    (if (or lazy (and (symbol? constructor) (::lazy (meta constructor)))
-                 (and (list? constructor) (symbol? (first constructor)) (::lazy (meta (first constructor)))))
+    (if (or lazy (lazy-constructor? constructor))
         (make-constructor-lazy type constructor)
         (make-constructor-eager type constructor)))
 
@@ -35,10 +39,10 @@
     [s]
     (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
     
-(defn- lazy?
+(defn- lazy-pattern?
     [pattern]
     (cond (symbol? pattern) (::lazy (meta (resolve pattern)))
-          (vector? pattern) (lazy? (first pattern))))
+          (vector? pattern) (lazy-pattern? (first pattern))))
 
 (defmacro defdatatype
     [type & constructors]
@@ -65,7 +69,7 @@
     (let [row-action-pairs  (partition 2 rules)
           rows              (map first row-action-pairs)
           transposed-rows   (apply map vector rows)
-          need-force        (map #(some lazy? %) transposed-rows)
+          need-force        (map #(some lazy-pattern? %) transposed-rows)
           actions           (map second row-action-pairs)
           transformed-args  (map transform-arg args need-force)
           transformed-rows  (map transform-row rows)
