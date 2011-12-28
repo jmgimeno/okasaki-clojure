@@ -4,7 +4,9 @@ An implementation of some data structures described in Okasaki's book "Purely
 Functional Data Structures".
 
 I'm trying to follow _almost directly_ the ML implementations using some sugar on David Nolen's [core.match]
-(https://github.com/clojure/core.match) library.
+(https://github.com/clojure/core.match) library. 
+
+This _sugar_ is defined in namespace datatype.core.
 
 ## Datatypes
 
@@ -50,7 +52,7 @@ For instance, we can define the Streams type as
     (defdatatype
         ::Streams
         Nil
-        ( ^:lazy Cons elem stream))
+        (^:datatype.core/lazy Cons elem stream))
 
 which would define the Cons constructor to be lazy.
 

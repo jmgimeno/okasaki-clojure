@@ -4,7 +4,7 @@
 (defdatatype
     ::Streams
     Nil
-    (^:lazy Cons elem stream))
+    (^:datatype.core/lazy Cons elem stream))
 
 (defun s-first [stream]
     [[Cons x _]] x)

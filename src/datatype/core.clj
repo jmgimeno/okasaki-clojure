@@ -9,24 +9,24 @@
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
-        `(def ~(vary-meta  constructor assoc :datatype type)
+        `(def ~(vary-meta  constructor assoc ::datatype type)
              ~(symbol-to-keyword constructor))
         (let [[name & args] constructor]
-            `(defn ~(vary-meta name assoc :datatype type) [~@args]
+            `(defn ~(vary-meta name assoc ::datatype type) [~@args]
                  [~(symbol-to-keyword name) ~@args]))))
 
 (defn- make-constructor-lazy
     [type constructor]
     (if (symbol? constructor)
-        `(def ~(vary-meta  constructor assoc :datatype type :lazy true)
+        `(def ~(vary-meta  constructor assoc ::datatype type ::lazy true)
              (delay ~(symbol-to-keyword constructor)))
         (let [[name & args] constructor]
-            `(defmacro ~(vary-meta name assoc :datatype type :lazy true) [~@args]
+            `(defmacro ~(vary-meta name assoc ::datatype type ::lazy true) [~@args]
                  (list 'delay [~(symbol-to-keyword name) ~@args])))))
 
 (defn- lazy-constructor?
     [constructor]
-    (cond (symbol? constructor) (:lazy (meta constructor))
+    (cond (symbol? constructor) (::lazy (meta constructor))
           (list? constructor) (lazy-constructor? (first constructor))))
     
 (defn- make-constructor
@@ -37,7 +37,7 @@
 
 (defn- lazy-pattern?
     [pattern]
-    (cond (symbol? pattern) (:lazy (meta (resolve pattern)))
+    (cond (symbol? pattern) (::lazy (meta (resolve pattern)))
           (vector? pattern) (lazy-pattern? (first pattern))))
 
 (defmacro defdatatype
@@ -52,7 +52,7 @@
 
 (defn- constructor?
     [s]
-    (and (symbol? s) (contains? (meta (resolve s)) :datatype)))
+    (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
     
 (defn- transform-row
     [pattern]

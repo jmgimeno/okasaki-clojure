@@ -16,8 +16,8 @@
     (is (= [::ctor 'x 'y] (ctor 'x 'y))))
 
 (deftest constructors-have-the-right-metadata
-    (is (= ::type (:datatype (meta #'expr))))
-    (is (= ::type (:datatype (meta #'ctor)))))
+    (is (= ::type (:datatype.core/datatype (meta #'expr))))
+    (is (= ::type (:datatype.core/datatype (meta #'ctor)))))
 
 (deftest caseof-works-properly
     (let [test #(caseof [%] [expr] 0 [[ctor x y]] (+ x y))]
@@ -26,7 +26,7 @@
 
 (deflazy ::lazy lexpr (lctor arg1 arg2))
 
-(defdatatype ::lazy2 ^:lazy lexpr2 (^:lazy lctor2 arg1 arg2))
+(defdatatype ::lazy2 ^:datatype.core/lazy lexpr2 (^:datatype.core/lazy lctor2 arg1 arg2))
 
 (deftest empty-constructor-returns-delayed-keyword-in-current-namespace
     (is (delay? lexpr))
@@ -47,8 +47,8 @@
 
 (with-private-fns [datatype.core [lazy-pattern?]]
     (deftest we-can-detect-lazy-patterns
-        (is (lazy-pattern? `lexpr))
-        (is (lazy-pattern? `[lctor x y]))
-        (is (lazy-pattern? `lexpr2))
-        (is (lazy-pattern? `[lctor2 x y]))))
+        (is (lazy-pattern? 'datatype.core-tests/lexpr))
+        (is (lazy-pattern? '[datatype.core-tests/lctor x y]))
+        (is (lazy-pattern? 'datatype.core-tests/lexpr2))
+        (is (lazy-pattern? '[datatype.core-tests/lctor2 x y]))))
 
