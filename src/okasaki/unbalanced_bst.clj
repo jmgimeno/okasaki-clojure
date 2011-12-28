@@ -1,5 +1,5 @@
 (ns okasaki.unbalanced-bst
-    (:use ml.datatype))
+    (:use datatype.core))
 
 (defdatatype
     ::UnbalancedBST

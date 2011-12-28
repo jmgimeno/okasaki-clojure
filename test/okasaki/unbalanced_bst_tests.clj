@@ -1,6 +1,6 @@
 (ns okasaki.unbalanced-bst-tests
-    (:use okasaki.unbalanced-bst)
-    (:use clojure.test))
+    (:use okasaki.unbalanced-bst
+          clojure.test))
 
 (deftest tree-without-nodes
     (is (not (member 1 Empty))))

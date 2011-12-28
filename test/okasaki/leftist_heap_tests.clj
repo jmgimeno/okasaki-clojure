@@ -1,6 +1,7 @@
 (ns okasaki.leftist-heap-tests
-    (:use [okasaki.leftist-heap :exclude [merge]])
-    (:use clojure.test))
+    (:refer-clojure :exclude [merge])
+    (:use okasaki.leftist-heap
+          clojure.test))
 
 (deftest minimum-of-a-single-node-heap
     (is (= 1 (findMin (insert 1 Empty)))))

@@ -1,6 +1,6 @@
-(ns ml.datatype-tests
-    (:use ml.datatype)
-    (:use clojure.test))
+(ns datatype.core-tests
+    (:use datatype.core
+          clojure.test))
 
 (defmacro with-private-fns [[ns fns] & tests]
   "Refers private fns from ns and runs tests in context."
@@ -45,7 +45,7 @@
 	(is (= 0 (test lexpr)))
 	(is (= 3 (test (lctor 1 2))))))
 
-(with-private-fns [ml.datatype [lazy-pattern?]]
+(with-private-fns [datatype.core [lazy-pattern?]]
     (deftest we-can-detect-lazy-patterns
         (is (lazy-pattern? `lexpr))
         (is (lazy-pattern? `[lctor x y]))

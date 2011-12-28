@@ -1,6 +1,6 @@
 (ns okasaki.streams-tests
-    (use okasaki.streams)
-    (use clojure.test))
+    (:use okasaki.streams
+          clojure.test))
 
 (defn nats
     ([]  (nats 0))

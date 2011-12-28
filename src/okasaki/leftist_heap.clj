@@ -1,6 +1,6 @@
 (ns okasaki.leftist-heap
     (:refer-clojure :exclude [merge])
-    (:use ml.datatype))
+    (:use datatype.core))
     
 (defdatatype
     ::LeftistHeap

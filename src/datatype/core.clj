@@ -1,4 +1,4 @@
-(ns ml.datatype
+(ns datatype.core
     (:use [clojure.core.match :only [match]]
           [clojure.walk :only [postwalk]]))
 

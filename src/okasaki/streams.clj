@@ -1,5 +1,5 @@
 (ns okasaki.streams
-    (use ml.datatype))
+    (:use datatype.core))
 
 (defdatatype
     ::Streams
