@@ -24,31 +24,31 @@
             `(defmacro ~(vary-meta name assoc ::datatype type ::lazy true) [~@args]
                  (list 'delay [~(symbol-to-keyword name) ~@args])))))
 
-(defn- lazy-constructor?
+(defn- has-lazy-meta?
     [constructor]
     (cond (symbol? constructor) (::lazy (meta constructor))
-          (list? constructor) (lazy-constructor? (first constructor))))
+          (list? constructor) (recur (first constructor))))
     
 (defn- make-constructor
-    [type lazy constructor]
-    (if (or lazy (lazy-constructor? constructor))
+    [type mode constructor]
+    (if (or (= mode :lazy) (has-lazy-meta? constructor))
         (make-constructor-lazy type constructor)
         (make-constructor-eager type constructor)))
 
 (defn- lazy-pattern?
     [pattern]
     (cond (symbol? pattern) (::lazy (meta (resolve pattern)))
-          (vector? pattern) (lazy-pattern? (first pattern))))
+          (vector? pattern) (recur (first pattern))))
 
 (defmacro defdatatype
     [type & constructors]
     `(do
-         ~@(map (partial make-constructor type false) constructors)))
+         ~@(map (partial make-constructor type :not-lazy) constructors)))
 
 (defmacro deflazy
     [type & constructors]
     `(do
-         ~@(map (partial make-constructor type true) constructors)))
+         ~@(map (partial make-constructor type :lazy) constructors)))
 
 (defn- constructor?
     [s]
