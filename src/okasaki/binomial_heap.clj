@@ -3,9 +3,9 @@
     (:use datatype.core))
 
 (defdatatype
-    ::TreeList
+    ::Heap
     Nil
-    (Cons tree treelist))
+    (Cons tree heap))
 
 (defun append [ls1 ls2]
     [Nil ls2] ls2
@@ -46,7 +46,7 @@
                                           (> (rank t1) (rank t2)) (Cons t2 (merge ts1 ts2_))
                                           :else (insTree (link t1 t2) (merge ts1_ ts2_))))
 
-(defun removeMinTree [s]
+(defun removeMinTree [h]
     [[Cons t Nil]] [t Nil]
     [[Cons t ts]] (let [[t_ ts_] (removeMinTree ts)]
                       (if (< (root t) (root t_))
