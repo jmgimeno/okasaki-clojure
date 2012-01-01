@@ -6,6 +6,10 @@
     [s]
     (keyword (str *ns*) (str s)))
 
+(defn- constructor-to-keyword
+    [s]
+    (keyword (subs (str (resolve s)) 2)))
+
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
@@ -56,7 +60,7 @@
     
 (defn- transform-row
     [pattern]
-    (postwalk #(if (constructor? %) (symbol-to-keyword %) %) pattern))
+    (postwalk #(if (constructor? %) (constructor-to-keyword %) %) pattern))
 
 (defn- transform-arg
     [arg needs-force]
