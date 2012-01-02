@@ -5,7 +5,7 @@
 (defdatatype
     ::LeftistHeap
     Empty
-    (Node r x a b))
+    (Node rank min left right))
 
 (declare merge rank makeT insert findMin deleteMin)
 
@@ -14,7 +14,7 @@
         h
     [Empty h]
         h
-    [([Node _ x a1 b1] :as h1) ([Node _ y a2 b2] :as h2)]
+    [[Node _ x a1 b1] [Node _ y a2 b2]]
         (if (< x y)
             (makeT x a1 (merge b1 h2))
             (makeT y a2 (merge h1 b2))))
@@ -27,11 +27,11 @@
     
 (defn makeT [x a b]
     (if (>= (rank a) (rank b))
-        (Node (inc (rank b)) x a b)
-        (Node (inc (rank a)) x b a)))
+        (->Node (inc (rank b)) x a b)
+        (->Node (inc (rank a)) x b a)))
         
 (defn insert [x h]
-    (merge (Node 1 x Empty Empty) h))
+    (merge (->Node 1 x Empty Empty) h))
     
 (defun findMin [h]
     [[Node _ x _ _]] 

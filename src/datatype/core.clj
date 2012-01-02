@@ -10,14 +10,19 @@
     [s]
     (keyword (subs (str (resolve s)) 2)))
 
+(defn- constructor-to-factory
+    [s]
+    (symbol (str "->" s)))
+
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
         `(def ~(vary-meta  constructor assoc ::datatype type)
              ~(symbol-to-keyword constructor))
         (let [[name & args] constructor]
-            `(defn ~(vary-meta name assoc ::datatype type) [~@args]
-                 [~(symbol-to-keyword name) ~@args]))))
+            `(do
+                 (defrecord ~name [~@args])
+                 (alter-meta! (var ~(constructor-to-factory name)) assoc ::datatype ~type)))))
 
 (defn- make-constructor-lazy
     [type constructor]
@@ -58,9 +63,33 @@
     [s]
     (and (symbol? s) (contains? (meta (resolve s)) ::datatype)))
     
+(defn- factory-args
+    [factory]
+    (first (:arglists (meta (resolve factory)))))
+
+(declare transform-condition)
+
+(defn- transform-vector
+    [[constructor & params]]
+    (let [args  (->> constructor
+                     constructor-to-factory
+                     factory-args
+                     (map keyword))
+          pairs (->> params
+                     (map transform-condition)
+                     (map vector args)
+                     (filter (fn [[arg param]] (not= param '_))))]
+        (into {} pairs)))
+
+(defn- transform-condition
+    [condition]
+    (cond (constructor? condition) (constructor-to-keyword condition)
+          (symbol? condition)      condition
+          (vector? condition)      (transform-vector condition)))
+
 (defn- transform-row
     [pattern]
-    (postwalk #(if (constructor? %) (constructor-to-keyword %) %) pattern))
+    (vec (map transform-condition pattern)))
 
 (defn- transform-arg
     [arg needs-force]

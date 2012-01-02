@@ -3,17 +3,17 @@
 
 (defdatatype
     ::UnbalancedBST
-    Empty         ; empty tree
-    (Node a x b)) ; tree with root x, left subtree a and right subtree b
+    Empty         
+    (Node left root right))
     
 (defun insert [x t]
     [x Empty] 
-        (Node Empty x Empty)
-    [x ([Node a y b] :as s)]
+        (->Node Empty x Empty)
+    [x [Node a y b]]
         (cond 
-            (< x y) (Node (insert x a) y b)
-            (< y x) (Node a y (insert x b))
-            :else   s))
+            (< x y) (->Node (insert x a) y b)
+            (< y x) (->Node a y (insert x b))
+            :else   t))
 
 (defun member [x t]
     [_ Empty]
