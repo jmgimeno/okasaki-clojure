@@ -1,7 +1,6 @@
 (ns datatype.core
-    (:refer-clojure :exclude [replace])
     (:use [clojure.core.match :only [match]]
-          [clojure.string :only [join replace split]]))
+          [clojure.string :only [join lower-case split]]))
 
 (defn- symbol-to-keyword
     [s]
@@ -20,14 +19,19 @@
                     factory
                     (str ns "/" factory)))))
 
+(defn- mangle-record-fields
+    [name args]
+    (map #(symbol (lower-case (str name "-" %))) args))
+
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
         `(def ~(vary-meta  constructor assoc ::datatype type)
              ~(symbol-to-keyword constructor))
-        (let [[name & args] constructor]
+        (let [[name & args] constructor
+              margs (mangle-record-fields name args)]
             `(do
-                 (defrecord ~name [~@args])
+                 (defrecord ~name [~@margs])
                  (alter-meta! (var ~(constructor-to-factory name)) assoc ::datatype ~type)))))
 
 (defn- make-constructor-lazy
@@ -35,11 +39,12 @@
     (if (symbol? constructor)
         `(def ~(vary-meta  constructor assoc ::datatype type ::lazy true)
              (delay ~(symbol-to-keyword constructor)))
-        (let [[name & args] constructor]
+        (let [[name & args] constructor
+              margs (mangle-record-fields name args)]
             `(do
-                 (defrecord ~name [~@args])
-                 (defmacro ~(vary-meta (constructor-to-factory name) assoc ::datatype type ::lazy true) [~@args]
-                     (list 'delay (list 'new ~name ~@args)))))))
+                 (defrecord ~name [~@margs])
+                 (defmacro ~(vary-meta (constructor-to-factory name) assoc ::datatype type ::lazy true) [~@margs]
+                     (list 'delay (list 'new ~name ~@margs)))))))
 
 (defn- has-lazy-meta?
     [constructor]

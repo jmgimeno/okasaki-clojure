@@ -14,7 +14,7 @@
 
 (defun insTree [t ts]
     [t Nil] (->Cons t Nil)
-    [t [Cons t_ ts_]] (if (< (:rank t) (:rank t_))
+    [t [Cons t_ ts_]] (if (< (:node-rank t) (:node-rank t_))
                           (->Cons t ts)
                           (recur (link t t_) ts_)))
 
@@ -24,20 +24,20 @@
 (defun merge [ts1 ts2]
     [ts1 Nil] ts1
     [Nil ts2] ts2
-    [[Cons t1 ts1_] [Cons t2 ts2_]] (cond (< (:rank t1) (:rank t2)) (->Cons t1 (merge ts1_ ts2))
-                                          (> (:rank t1) (:rank t2)) (->Cons t2 (merge ts1 ts2_))
+    [[Cons t1 ts1_] [Cons t2 ts2_]] (cond (< (:node-rank t1) (:node-rank t2)) (->Cons t1 (merge ts1_ ts2))
+                                          (> (:node-rank t1) (:node-rank t2)) (->Cons t2 (merge ts1 ts2_))
                                           :else (insTree (link t1 t2) (merge ts1_ ts2_))))
 
 (defun removeMinTree [h]
     [[Cons t Nil]] [t Nil]
     [[Cons t ts]] (let [[t_ ts_] (removeMinTree ts)]
-                      (if (< (:root t) (:root t_))
+                      (if (< (:node-root t) (:node-root t_))
                           [t ts]
                           [t_ (->Cons t ts_)])))
 
 (defn findMin [h]
     (let [[t _] (removeMinTree h)]
-        (:root t)))
+        (:node-root t)))
 
 (defn deleteMin [h]
     (let [[t ts] (removeMinTree h)]

@@ -23,8 +23,7 @@ For instance, a _datatype_ for unbalanced binary search trees can be defined as:
 * _Constant constructors_ are represented as symbols bound to the corresponding keyword (e.g. Empty to :Empty) 
 both in the current namespace.
 
-* _Factory constructors_ are represented as records with the same name
-  and corresponding fields. 
+* _Factory constructors_ are represented as records with the same name as given  and corresponding fields. Field names are magled in order to not have conficts among different constructors using the same names. For instance, in the example, fields are named node-left, node-root and node-right.
   
 ## defun
 
@@ -49,7 +48,7 @@ We can now define  _functions_ using pairs of patterns and actions:
                 :else   true))
 
 As _factory constructors_ are defined as records, we can use ->Node,
-:left, :root, :right on the actions.
+:node-left, :node-root, :node-right on the actions.
 
 ## caseof
 

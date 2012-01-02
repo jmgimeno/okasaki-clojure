@@ -14,8 +14,8 @@
 
 (deftest non-empty-constructor-creates-record
     (let [elem (->ctor 'x 'y)]
-        (is (= 'x (:arg1 elem)))
-        (is (= 'y (:arg2 elem)))))
+        (is (= 'x (:ctor-arg1 elem)))
+        (is (= 'y (:ctor-arg2 elem)))))
 
 (deftest constructors-have-the-right-metadata
     (is (= ::type (:datatype.core/datatype (meta #'expr))))
@@ -48,10 +48,10 @@
  (deftest non-empty-constructor-returns-delayed-record
      (let [record1 (force (->lctor 'x 'y))
            record2 (force (->lctor2 'x 'y))]
-         (is (= 'x (:arg1 record1)))
-         (is (= 'y (:arg2 record1)))
-         (is (= 'x (:arg1 record2)))
-         (is (= 'y (:arg2 record2)))))
+         (is (= 'x (:lctor-arg1 record1)))
+         (is (= 'y (:lctor-arg2 record1)))
+         (is (= 'x (:lctor2-arg1 record2)))
+         (is (= 'y (:lctor2-arg2 record2)))))
 
 (deftest caseof-works-properly-with-lazy
     (let [test #(caseof [%] [lexpr] 0 [[lctor x y]] (+ x y))]
