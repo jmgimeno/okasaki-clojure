@@ -1,4 +1,5 @@
-* Allow :else and :or patterns
+* Clean and refactor code
+* Allow :or patterns
 * Better error checking and more tests
 * Allow for private datatypes and funs
 

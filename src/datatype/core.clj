@@ -97,7 +97,9 @@
 
 (defn- transform-row
     [pattern]
-    (vec (map transform-condition pattern)))
+    (if (= pattern :else)
+        pattern
+        (vec (map transform-condition pattern))))
 
 (defn- transform-arg
     [arg needs-force]
@@ -109,7 +111,8 @@
     [args & rules]
     (let [row-action-pairs  (partition 2 rules)
           rows              (map first row-action-pairs)
-          transposed-rows   (apply map vector rows)
+          filtered-rows     (filter #(not= :else %) rows)
+          transposed-rows   (apply map vector filtered-rows)
           need-force        (map #(some lazy-pattern? %) transposed-rows)
           actions           (map second row-action-pairs)
           transformed-args  (map transform-arg args need-force)

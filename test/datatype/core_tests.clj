@@ -26,7 +26,10 @@
 	(is (= 0 (test expr)))
 	(is (= 3 (test (->ctor 1 2))))))
 
-
+(deftest we-can-define-else-patterns
+    (let [test #(caseof [%] [expr] 0 :else 1)]
+        (is (= 0 (test expr)))
+        (is (= 1 (test (->ctor 1 2))))))
 
  (deflazy ::lazy lexpr (lctor arg1 arg2))
 
