@@ -20,10 +20,6 @@
                     factory
                     (str ns "/" factory)))))
 
-(defn- qualified-constructor-to-factory
-    [s]
-    (symbol (replace (str s) #"([^.]+)$" "/->$1")))
-
 (defn- make-constructor-eager
     [type constructor]
     (if (symbol? constructor)
