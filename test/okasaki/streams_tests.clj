@@ -4,10 +4,10 @@
 
 (defn nats
     ([]  (nats 0))
-    ([n] (Cons n (nats (inc n)))))
+    ([n] (->Cons n (nats (inc n)))))
 
 (deftest first-element-stream-of-length-one
-    (is (= 0 (s-first (Cons 0 Nil)))))
+    (is (= 0 (s-first (->Cons 0 Nil)))))
 
 (deftest first-nat-is-zero
     (is (zero? (s-first (nats)))))

@@ -1,6 +1,7 @@
 (ns datatype.core
+    (:refer-clojure :exclude [replace])
     (:use [clojure.core.match :only [match]]
-          [clojure.walk :only [postwalk]]))
+          [clojure.string :only [join replace split]]))
 
 (defn- symbol-to-keyword
     [s]
@@ -12,7 +13,16 @@
 
 (defn- constructor-to-factory
     [s]
-    (symbol (str "->" s)))
+    (let [parts (split (str s) #"[.]")
+          ns (join "." (butlast parts))
+          factory (str "->" (last parts))]
+        (symbol (if (empty? ns)
+                    factory
+                    (str ns "/" factory)))))
+
+(defn- qualified-constructor-to-factory
+    [s]
+    (symbol (replace (str s) #"([^.]+)$" "/->$1")))
 
 (defn- make-constructor-eager
     [type constructor]
@@ -30,8 +40,10 @@
         `(def ~(vary-meta  constructor assoc ::datatype type ::lazy true)
              (delay ~(symbol-to-keyword constructor)))
         (let [[name & args] constructor]
-            `(defmacro ~(vary-meta name assoc ::datatype type ::lazy true) [~@args]
-                 (list 'delay [~(symbol-to-keyword name) ~@args])))))
+            `(do
+                 (defrecord ~name [~@args])
+                 (defmacro ~(vary-meta (constructor-to-factory name) assoc ::datatype type ::lazy true) [~@args]
+                     (list 'delay (list 'new ~name ~@args)))))))
 
 (defn- has-lazy-meta?
     [constructor]
@@ -47,7 +59,7 @@
 (defn- lazy-pattern?
     [pattern]
     (cond (symbol? pattern) (::lazy (meta (resolve pattern)))
-          (vector? pattern) (recur (first pattern))))
+          (vector? pattern) (recur (constructor-to-factory (first pattern)))))
 
 (defmacro defdatatype
     [type & constructors]
@@ -84,8 +96,8 @@
 (defn- transform-condition
     [condition]
     (cond (constructor? condition) (constructor-to-keyword condition)
-          (symbol? condition)      condition
-          (vector? condition)      (transform-vector condition)))
+          (vector? condition)      (transform-vector condition)
+          :else                    condition))
 
 (defn- transform-row
     [pattern]

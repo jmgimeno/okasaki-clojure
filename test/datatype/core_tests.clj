@@ -26,7 +26,7 @@
 	(is (= 0 (test expr)))
 	(is (= 3 (test (->ctor 1 2))))))
 
-(comment
+
 
  (deflazy ::lazy lexpr (lctor arg1 arg2))
 
@@ -38,21 +38,26 @@
      (is (delay? lexpr2))
      (is (= ::lexpr2 (force lexpr2))))
 
- (deftest non-empty-constructor-returns-delayed-vector
-     (is (delay? (lctor 'x 'y)))
-     (is (= [::lctor 'x 'y] (force (lctor 'x 'y))))
-     (is (delay? (lctor2 'x 'y)))
-     (is (= [::lctor2 'x 'y] (force (lctor2 'x 'y)))))
+ (deftest non-empty-constructor-is-delayed
+     (is (delay? (->lctor 'x 'y)))
+     (is (delay? (->lctor2 'x 'y))))
 
- (deftest caseof-works-properly-with-lazy
-     (let [test #(caseof [%] [lexpr] 0 [[lctor x y]] (+ x y))]
-         (is (= 0 (test lexpr)))
-         (is (= 3 (test (lctor 1 2))))))
+ (deftest non-empty-constructor-returns-delayed-record
+     (let [record1 (force (->lctor 'x 'y))
+           record2 (force (->lctor2 'x 'y))]
+         (is (= 'x (:arg1 record1)))
+         (is (= 'y (:arg2 record1)))
+         (is (= 'x (:arg1 record2)))
+         (is (= 'y (:arg2 record2)))))
 
- (with-private-fns [datatype.core [lazy-pattern?]]
-     (deftest we-can-detect-lazy-patterns
-         (is (lazy-pattern? 'datatype.core-tests/lexpr))
-         (is (lazy-pattern? '[datatype.core-tests/lctor x y]))
-         (is (lazy-pattern? 'datatype.core-tests/lexpr2))
-         (is (lazy-pattern? '[datatype.core-tests/lctor2 x y]))))
- )
+(deftest caseof-works-properly-with-lazy
+    (let [test #(caseof [%] [lexpr] 0 [[lctor x y]] (+ x y))]
+        (is (= 0 (test lexpr)))
+        (is (= 3 (test (->lctor 1 2))))))
+
+(with-private-fns [datatype.core [lazy-pattern?]]
+    (deftest we-can-detect-lazy-patterns
+        (is (lazy-pattern? 'datatype.core-tests/lexpr))
+        (is (lazy-pattern? '[datatype.core-tests.lctor x y]))
+        (is (lazy-pattern? 'datatype.core-tests/lexpr2))
+        (is (lazy-pattern? '[datatype.core-tests.lctor2 x y]))))
