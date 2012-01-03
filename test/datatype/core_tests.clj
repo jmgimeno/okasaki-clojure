@@ -58,9 +58,11 @@
         (is (= 0 (test lexpr)))
         (is (= 3 (test (->lctor 1 2))))))
 
-(with-private-fns [datatype.core [lazy-pattern?]]
+(with-private-fns [datatype.core [lazy-condition?]]
     (deftest we-can-detect-lazy-patterns
-        (is (lazy-pattern? 'datatype.core-tests/lexpr))
-        (is (lazy-pattern? '[datatype.core-tests.lctor x y]))
-        (is (lazy-pattern? 'datatype.core-tests/lexpr2))
-        (is (lazy-pattern? '[datatype.core-tests.lctor2 x y]))))
+        (is (not (lazy-condition? 'datatype.core-tests/expr)))
+        (is (not (lazy-condition? '[datatype.core-tests/ctor x y])))
+        (is (lazy-condition? 'datatype.core-tests/lexpr))
+        (is (lazy-condition? '[datatype.core-tests.lctor x y]))
+        (is (lazy-condition? 'datatype.core-tests/lexpr2))
+        (is (lazy-condition? '[datatype.core-tests.lctor2 x y]))))
