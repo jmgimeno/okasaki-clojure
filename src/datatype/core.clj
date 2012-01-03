@@ -110,8 +110,8 @@
     (filter #(not= :else %) rows))
 
 (defn- transform-constant
-    [s]
-    (keyword (subs (str (resolve s)) 2)))
+    [constant]
+    (keyword (subs (str (resolve constant)) 2)))
 
 (declare transform-condition)
 
@@ -124,7 +124,7 @@
           pairs (->> params
                      (map transform-condition)
                      (map vector args)
-                     (filter (fn [[arg param]] (not= param '_))))]
+                     (filter (fn [[_ param]] (not= param '_))))]
         (into {} pairs)))
 
 (defn- transform-condition
