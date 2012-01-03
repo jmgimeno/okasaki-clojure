@@ -30,9 +30,6 @@
                           [Empty] (->Node Red Empty x Empty)
                           [[Node color a y b]] (cond (< x y) (balance color (ins a) y b)
                                                      (> x y) (balance color a y (ins b))
-                                                     :else   s)))
-          res (ins s)
-          left (:node-left res)
-          root (:node-root res)
-          right (:node-right res)]
-        (->Node Black left root right)))
+                                                     :else   s)))]
+        (caseof [(ins s)]
+                [[Node _ left root right]] (->Node Black left root right))))
