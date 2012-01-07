@@ -65,4 +65,39 @@
         (is (lazy-condition? 'datatype.core-tests/lexpr))
         (is (lazy-condition? '[datatype.core-tests.lctor x y]))
         (is (lazy-condition? 'datatype.core-tests/lexpr2))
-        (is (lazy-condition? '[datatype.core-tests.lctor2 x y]))))
+        (is (lazy-condition? '[datatype.core-tests.lctor2 x y]))
+        (is (lazy-condition? '($ datatype.core-tests/expr)))
+        (is (lazy-condition? '($ [datatype.core-tests/ctor x y])))))
+
+(deftest caseof-works-properly-with-dollar
+    (let [test #(caseof [%] [($ expr)] 0 [($ [ctor x y])] (+ x y))]
+        (is (= 0 (test ($ expr))))
+        (is (= 3 (test ($ (->ctor 1 2)))))))
+
+(defn- counted [counter number]
+    (swap! counter inc)
+    number)
+
+(defun plus1 [x y]
+    [($ m) ($ n)] ($ (+ m n)))
+
+(deftest plus1-evals-when-applied
+    (let [num-evals (atom 0)
+          arg1 ($ (counted num-evals 1))
+          arg2 ($ (counted num-evals 2))
+          sum (plus1 arg1 arg2)]
+        (is (= 2 @num-evals))
+        (is (= 3 (force sum)))
+        (is (= 2 @num-evals))))
+
+(defunlazy plus2 [x y]
+    [($ m) ($ n)] ($ (+ m n)))
+
+(deftest plus1-evals-when-evaluated
+    (let [num-evals (atom 0)
+          arg1 ($ (counted num-evals 1))
+          arg2 ($ (counted num-evals 2))
+          sum (plus2 arg1 arg2)]
+        (is (= 0 @num-evals))
+        (is (= 3 (force sum)))
+        (is (= 2 @num-evals))))

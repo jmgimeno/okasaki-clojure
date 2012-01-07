@@ -97,9 +97,13 @@
                factory (factory-symbol constructor)]
              (lazy? factory))))
 
+(defn- dollar-expr?
+    [condition]
+    (and (list? condition) (= '$ (first condition))))
+
 (defn- lazy-condition?
     [condition]
-    (or (lazy-constant? condition) (lazy-factory? condition)))
+    (or (lazy-constant? condition) (lazy-factory? condition) (dollar-expr? condition)))
 
 (defn- factory-args
     [factory]
@@ -127,10 +131,15 @@
                      (filter (fn [[_ param]] (not= param '_))))]
         (into {} pairs)))
 
+(defn- transform-dollar
+    [[dollar expr]]
+    (transform-condition expr))
+
 (defn- transform-condition
     [condition]
     (cond (constant? condition) (transform-constant condition)
           (factory? condition)  (transform-factory condition)
+          (dollar-expr? condition) (transform-dollar condition)
           :else                 condition))
 
 (defn- transform-row
@@ -139,11 +148,12 @@
         row
         (vec (map transform-condition row))))
 
-(defn- transform-arg
-    [arg needs-force]
-    (if needs-force
-        `(force ~arg)
-        arg))
+(defn- create-local-bindings
+    [args new-args]
+    (->> (interleave args new-args)
+         (partition 2)
+         (filter (partial apply not=))
+         (mapcat (fn [[arg new]] `(~new (force ~arg))))))
 
 (defmacro caseof
     [args & rules]
@@ -153,15 +163,32 @@
           filtered-rows     (filter-rows rows)
           transposed-rows   (apply map vector filtered-rows)
           need-force        (map #(some lazy-condition? %) transposed-rows)
-          transformed-args  (map transform-arg args need-force)
+          new-args          (map #(if %1 (gensym) %2) need-force args)
+          local-bindings    (create-local-bindings args new-args)
           transformed-rows  (map transform-row rows)
           transformed-rules (interleave transformed-rows actions)]
-        `(match ~(vec transformed-args)
-                ~@transformed-rules)))
+        `(let [~@(create-local-bindings args new-args)]
+             (match ~(vec new-args)
+                    ~@transformed-rules))))
+
+(defmacro $
+    [expr]
+    `(delay ~expr))
 
 (defmacro defun
     [name args & rules]
     `(defn ~name ~args
          (caseof ~args
                  ~@rules)))
+
+(defmacro defunlazy
+    [name args & rules]
+    (let [row-action-pairs    (partition 2 rules)
+          rows                (map first row-action-pairs)
+          actions             (map second row-action-pairs)
+          transformed-actions (map #(list `force %) actions)
+          transformed-rules   (interleave rows transformed-actions)]
+        `(defn ~name ~args
+             ($ (caseof ~args
+                        ~@transformed-rules)))))
 
