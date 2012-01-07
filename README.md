@@ -59,7 +59,46 @@ macro:
         [Empty]         true
         [[Node _ _ _]] false)
 
-## Lazy constructors
+## $-notation
+
+In chapter 4 of the book $-notation is presented to allow lazy-evaluation. We have defined symbol $ with two 
+complementary meanings, depending on the side of the rule where it appears:
+
+* When used in the _action_ part of the rule ($ expr) is completely equivalent to (delay expr)
+* In a pattern, we have that ($ pattern) matched expr when pattern matches (force expr)
+
+For instance, we can define Streams as delayed StreamCells and define:
+
+    (defun s-drop_ [number stream]
+           [0 s] s
+           [n ($ Nil)] ($ Nil)
+           [n ($ [Cons x s])] (recur (dec n) s))
+
+### defunlazy
+
+In order to simplify the construction of lazy-functions (which return delayed objects) we have defined the 
+_equivalent_ macro using the definition given in the book:
+
+    fun lazy f p = e 
+
+is equivalent to
+
+    fun f x = $case x of p => force e
+
+For instance, we can define now:
+
+    (defunlazy s-append [stream1 stream2]
+               [($ Nil)        t] t
+               [($ [Cons x s]) t] ($ (->Cons x (s-append s t))))
+
+and the streams are not evaluated when applied but when accessed.
+
+
+## Some simplifications
+
+An alternartive to $-notation has been defined to simplify some lazy definitions and datatypes.
+
+### Lazy constructors
 
 Some constructors can be lazy: they are evaluated only if needed. 
 
@@ -81,7 +120,7 @@ Using it we can define a function that returns the infinite stream of naturals
           ([]  (nats 0))
           ([n] (->Cons n (nats (inc n)))))
           
-### deflazy
+#### deflazy
 
 When we want to define all the constructors of a datatype as lazy, we
 can use deflazy as a shortcut.
