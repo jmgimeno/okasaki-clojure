@@ -3,7 +3,7 @@
     (:use datatype.core
           okasaki.list))
 
-;; Solution to exercice 5.1
+;; Solution to exercise 5.1
 
 (defdatatype
     ::Deque
