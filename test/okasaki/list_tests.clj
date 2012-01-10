@@ -1,4 +1,5 @@
 (ns okasaki.list-tests
+    (:refer-clojure :exclude [split-at])
     (:use okasaki.list
           clojure.test))
 

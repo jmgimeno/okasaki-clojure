@@ -1,5 +1,5 @@
 (ns okasaki.batched-queue
-    (:refer-clojure :exclude [empty?])
+    (:refer-clojure :exclude [empty? split-at])
     (:use datatype.core
           okasaki.list))
 

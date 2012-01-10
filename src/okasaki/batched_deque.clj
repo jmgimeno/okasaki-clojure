@@ -1,5 +1,5 @@
 (ns okasaki.batched-deque
-    (:refer-clojure :exclude [cons empty? last])
+    (:refer-clojure :exclude [cons empty? last split-at])
     (:use datatype.core
           okasaki.list))
 
@@ -16,24 +16,23 @@
     [[Quad 0 Nil 0 Nil]] true
     :else                false)
 
-(defun equalize
-    [queue]
-    [[Quad c1 [Cons h1 t1] c2 [Cons h2 t2]]] (let [diff (- c1 c2)]
-                                                 (cond (< diff -1) (recur (->Quad (inc c1) (->Cons h2 (->Cons h1 t1)) (dec c2) t2))
-                                                       (> diff +1) (recur (->Quad (dec c1) t1 (inc c2) (->Cons h1 (->Cons h2 t2))))
-                                                       :else       queue)))
-
 (defun checkf
     [queue]
-    [[Quad 0 Nil 1 _]] queue
-    [[Quad 1 _ 0 Nil]] queue
-    [[Quad 0 Nil c [Cons h t]]] (caseof
-                                 [(equalize (->Quad 1 (->Cons h Nil) (dec c) t))]
-                                 [[Quad cf f cr r]] (->Quad cr (rev r) cf (rev f)))
-    [[Quad c [Cons h t] 0 Nil]] (caseof
-                                 [(equalize (->Quad (dec c) t 1 (->Cons h Nil)))]
-                                 [[Quad cf f cr r]] (->Quad cr (rev r) cf (rev f)))
-    :else                       queue)
+    [[Quad 0 Nil cr r]] (if (> cr 1)
+                            (let [nnr (quot cr 2)
+                                  nnf (- cr nnr)
+                                  [nr rnf] (split-at nnr r)
+                                  nf (rev rnf)]
+                                (->Quad nnf nf nnr nr))
+                            queue)
+    [[Quad cf f 0 Nil]] (if (> cf 1)
+                            (let [nnf (quot cf 2)
+                                  nnr (- cf nnf)
+                                  [nf rnr] (split-at nnf f)
+                                  nr (rev rnr)]
+                                (->Quad nnf nf nnr nr))
+                            queue)
+    :else queue)
 
 (defun cons
     [elem deque]

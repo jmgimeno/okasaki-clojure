@@ -1,5 +1,5 @@
 (ns okasaki.binomial-heap
-    (:refer-clojure :exclude [merge])
+    (:refer-clojure :exclude [merge split-at])
     (:use datatype.core
           okasaki.list))
 

@@ -1,5 +1,5 @@
 (ns okasaki.batched-deque-tests
-    (:refer-clojure :exclude [cons empty? last])
+    (:refer-clojure :exclude [cons empty? last split-at])
     (:use okasaki.batched-deque
           okasaki.list
           clojure.test))

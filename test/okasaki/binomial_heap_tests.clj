@@ -1,5 +1,5 @@
 (ns okasaki.binomial-heap-tests
-    (:refer-clojure :exclude [merge])
+    (:refer-clojure :exclude [merge split-at])
     (:use okasaki.list
           okasaki.binomial-heap
           clojure.test))
