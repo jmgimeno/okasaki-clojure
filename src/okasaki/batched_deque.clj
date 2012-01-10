@@ -16,21 +16,23 @@
     [[Quad 0 Nil 0 Nil]] true
     :else                false)
 
-(defun checkf
+(defn- split-and-reverse-bottom
+    [n l]
+    (let [ntop (quot n 2)
+          nbottom (- n ntop)
+          [top rbottom] (split-at ntop l)
+          bottom (rev rbottom)]
+        [ntop top nbottom bottom]))
+
+(defun ^:private checkf
     [queue]
     [[Quad 0 Nil cr r]] (if (> cr 1)
-                            (let [nnr (quot cr 2)
-                                  nnf (- cr nnr)
-                                  [nr rnf] (split-at nnr r)
-                                  nf (rev rnf)]
-                                (->Quad nnf nf nnr nr))
+                            (let [[cnr nr cnf nf] (split-and-reverse-bottom cr r)]
+                                (->Quad cnf nf cnr nr))
                             queue)
     [[Quad cf f 0 Nil]] (if (> cf 1)
-                            (let [nnf (quot cf 2)
-                                  nnr (- cf nnf)
-                                  [nf rnr] (split-at nnf f)
-                                  nr (rev rnr)]
-                                (->Quad nnf nf nnr nr))
+                            (let [[cnf nf cnr nr] (split-and-reverse-bottom cf f)]
+                                (->Quad cnf nf cnr nr))
                             queue)
     :else queue)
 
