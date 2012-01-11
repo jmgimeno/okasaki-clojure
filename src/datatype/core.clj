@@ -181,12 +181,18 @@
          (caseof ~args
                  ~@rules)))
 
+(defn- force-or-simplify
+    [action]
+    (if (and (list? action) (= (first action) '$))
+        (second action)
+        `(force ~action)))
+
 (defmacro defunlazy
     [name args & rules]
     (let [row-action-pairs    (partition 2 rules)
           rows                (map first row-action-pairs)
           actions             (map second row-action-pairs)
-          transformed-actions (map #(list `force %) actions)
+          transformed-actions (map force-or-simplify actions)
           transformed-rules   (interleave rows transformed-actions)]
         `(defn ~name ~args
              ($ (caseof ~args
