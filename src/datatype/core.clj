@@ -181,7 +181,7 @@
          (caseof ~args
                  ~@rules)))
 
-(defn- force-or-simplify
+(defn- force-or-remove-delay
     [action]
     (if (and (list? action) (= (first action) '$))
         (second action)
@@ -192,7 +192,7 @@
     (let [row-action-pairs    (partition 2 rules)
           rows                (map first row-action-pairs)
           actions             (map second row-action-pairs)
-          transformed-actions (map force-or-simplify actions)
+          transformed-actions (map force-or-remove-delay actions)
           transformed-rules   (interleave rows transformed-actions)]
         `(defn ~name ~args
              ($ (caseof ~args
