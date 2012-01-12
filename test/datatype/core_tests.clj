@@ -101,3 +101,24 @@
         (is (= 0 @num-evals))
         (is (= 3 (force sum)))
         (is (= 2 @num-evals))))
+
+(deftest as-patterns
+    (let [test #(caseof [%] [([ctor x y] :as b)] [b (+ x y)] [a] a )
+          expr1 expr
+          expr2 (->ctor 1 2)]
+        (is (= expr1 (test expr1)))
+        (is (= [expr2 3] (test expr2)))))
+
+(deftest as-patterns-with-lazy-datatypes
+    (let [test #(caseof [%] [([lctor x y] :as b)] [b (+ x y)] [a] a )
+          lexpr1 lexpr
+          lexpr2 (->lctor 1 2)]
+        (is (= (force lexpr1) (test lexpr1)))
+        (is (= [(force lexpr2) 3] (test lexpr2)))))
+
+(deftest as-patterns-with-dollar-expressions
+    (let [test #(caseof [%] [($ expr)] 0 [(($ [ctor x y]) :as all)] [all (+ x y)])
+          expr1 ($ expr)
+          expr2 ($ (->ctor 1 2))]
+        (is (= 0 (test expr1)))
+        (is (= [(force expr2) 3] (test expr2)))))

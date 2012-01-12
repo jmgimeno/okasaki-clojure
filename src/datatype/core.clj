@@ -101,9 +101,16 @@
     [condition]
     (and (list? condition) (= '$ (first condition))))
 
+(defn- as-expr?
+    [condition]
+    (and (list? condition) (= :as (second condition))))
+
 (defn- lazy-condition?
     [condition]
-    (or (lazy-constant? condition) (lazy-factory? condition) (dollar-expr? condition)))
+    (or (lazy-constant? condition)
+        (lazy-factory? condition)
+        (dollar-expr? condition)
+        (and (as-expr? condition) (lazy-condition? (first condition)))))
 
 (defn- factory-args
     [factory]
@@ -135,11 +142,16 @@
     [[dollar expr]]
     (transform-condition expr))
 
+(defn- transform-as
+    [[expr as symbol]]
+    (list (transform-condition expr) :as symbol))
+
 (defn- transform-condition
     [condition]
     (cond (constant? condition) (transform-constant condition)
           (factory? condition)  (transform-factory condition)
           (dollar-expr? condition) (transform-dollar condition)
+          (as-expr? condition) (transform-as condition)
           :else                 condition))
 
 (defn- transform-row
