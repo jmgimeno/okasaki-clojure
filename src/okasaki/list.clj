@@ -7,11 +7,13 @@
     Nil
     (Cons elem list))
 
-(defun append [ls1 ls2]
+(defun append
+    [list1 list2]
     [Nil ls2] ls2
     [[Cons l1 ls1_] ls2] (->Cons l1 (append ls1_ ls2)))
 
-(defun rev [ts]
+(defun rev
+    [list]
     [Nil] Nil
     [[Cons t ts_]] (append (rev ts_) (->Cons t Nil)))
 

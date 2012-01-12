@@ -26,15 +26,15 @@
 
 (defun ^:private checkf
     [queue]
-    [[Quad 0 Nil cr r]] (if (> cr 1)
+    [([Quad 0 Nil cr r] :as q)] (if (> cr 1)
                             (let [[cnr nr cnf nf] (split-and-reverse-bottom cr r)]
                                 (->Quad cnf nf cnr nr))
-                            queue)
-    [[Quad cf f 0 Nil]] (if (> cf 1)
+                            q)
+    [([Quad cf f 0 Nil] :as q)] (if (> cf 1)
                             (let [[cnf nf cnr nr] (split-and-reverse-bottom cf f)]
                                 (->Quad cnf nf cnr nr))
-                            queue)
-    :else queue)
+                            q)
+    [q] q)
 
 (defun cons
     [elem deque]
@@ -58,8 +58,8 @@
 
 (defun last
     [queue]
-    [[Quad 0 Nil 0 Nil]]        (throw (IllegalStateException. "Attempting last of an empty queue"))
-    [[Quad _ _ _ [Cons h t]]]   h
+    [[Quad 0 Nil 0 Nil]]          (throw (IllegalStateException. "Attempting last of an empty queue"))
+    [[Quad _ _ _ [Cons h t]]]     h
     [[Quad 1 [Cons h Nil] 0 Nil]] h)
 
 (defun init

@@ -17,7 +17,7 @@
 (defun checkf
     [queue]
     [[Pair Nil r]] (->Pair (rev r) Nil)
-    :else          queue)
+    [q]            q)
 
 (defun snoc
     [queue elem]

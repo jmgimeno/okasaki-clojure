@@ -7,40 +7,47 @@
     ::Tree
     (Node rank root treelist))
 
-(defun link [t1, t2]
-    [[Node r x1 c1] [Node _ x2 c2]] (if (< x1 x2)
-                                        (->Node (inc r) x1 (->Cons t2 c1))
-                                        (->Node (inc r) x2 (->Cons t1 c2))))
+(defun link
+    [tree1 tree2]
+    [([Node r x1 c1] :as t1) ([Node _ x2 c2] :as t2)] (if (< x1 x2)
+                                                          (->Node (inc r) x1 (->Cons t2 c1))
+                                                          (->Node (inc r) x2 (->Cons t1 c2))))
 
-(defun insTree [t ts]
-    [t Nil] (->Cons t Nil)
-    [t [Cons t_ ts_]] (if (< (:node-rank t) (:node-rank t_))
-                          (->Cons t ts)
-                          (recur (link t t_) ts_)))
+(defun insTree
+    [tree heap]
+    [t Nil]                    (->Cons t Nil)
+    [t ([Cons t_ ts_] :as ts)] (if (< (:node-rank t) (:node-rank t_))
+                                   (->Cons t ts)
+                                   (recur (link t t_) ts_)))
 
-(defn insert [x h]
-    (insTree (->Node 0 x Nil) h))
+(defn insert
+    [elem heap]
+    (insTree (->Node 0 elem Nil) heap))
 
-(defun merge [ts1 ts2]
+(defun merge
+    [heap1 heap2]
     [ts1 Nil] ts1
     [Nil ts2] ts2
-    [[Cons t1 ts1_] [Cons t2 ts2_]] (cond (< (:node-rank t1) (:node-rank t2)) (->Cons t1 (merge ts1_ ts2))
-                                          (> (:node-rank t1) (:node-rank t2)) (->Cons t2 (merge ts1 ts2_))
-                                          :else (insTree (link t1 t2) (merge ts1_ ts2_))))
+    [([Cons t1 ts1_] :as ts1) ([Cons t2 ts2_] :as ts2)] (cond (< (:node-rank t1) (:node-rank t2)) (->Cons t1 (merge ts1_ ts2))
+                                                              (> (:node-rank t1) (:node-rank t2)) (->Cons t2 (merge ts1 ts2_))
+                                                              :else (insTree (link t1 t2) (merge ts1_ ts2_))))
 
-(defun removeMinTree [h]
+(defun removeMinTree
+    [heap]
     [[Cons t Nil]] [t Nil]
     [[Cons t ts]] (let [[t_ ts_] (removeMinTree ts)]
                       (if (< (:node-root t) (:node-root t_))
                           [t ts]
                           [t_ (->Cons t ts_)])))
 
-(defn findMin [h]
-    (let [[t _] (removeMinTree h)]
+(defn findMin
+    [heap]
+    (let [[t _] (removeMinTree heap)]
         (:node-root t)))
 
-(defn deleteMin [h]
-    (let [[t ts] (removeMinTree h)]
+(defn deleteMin
+    [heap]
+    (let [[t ts] (removeMinTree heap)]
         (caseof [t]
                 [[Node _ x ts_]] (merge (rev ts_) ts))))
 

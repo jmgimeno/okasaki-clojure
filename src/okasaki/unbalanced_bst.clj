@@ -6,16 +6,18 @@
     Empty         
     (Node left root right))
     
-(defun insert [x t]
+(defun insert
+    [elem tree]
     [x Empty] 
         (->Node Empty x Empty)
-    [x [Node a y b]]
+    [x ([Node a y b] :as t)]
         (cond 
             (< x y) (->Node (insert x a) y b)
             (< y x) (->Node a y (insert x b))
             :else   t))
 
-(defun member [x t]
+(defun member
+    [elem tree]
     [_ Empty]
         false
     [x [Node a y b]]
