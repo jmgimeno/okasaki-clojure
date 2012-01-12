@@ -78,7 +78,8 @@
     (swap! counter inc)
     number)
 
-(defun plus1 [x y]
+(defun plus1
+    [x y]
     [($ m) ($ n)] ($ (+ m n)))
 
 (deftest plus1-evals-when-applied
@@ -90,7 +91,8 @@
         (is (= 3 (force sum)))
         (is (= 2 @num-evals))))
 
-(defunlazy plus2 [x y]
+(defunlazy plus2
+    [x y]
     [($ m) ($ n)] ($ (+ m n)))
 
 (deftest plus1-evals-when-evaluated

@@ -167,6 +167,20 @@
          (filter (partial apply not=))
          (mapcat (fn [[arg new]] `(~new (force ~arg))))))
 
+(defn- make-args-from-rules
+    [rules]
+    (-> rules first count (take (repeatedly #(gensym "defun-"))) vec))
+
+(defn- force-or-remove-delay
+    [action]
+    (if (and (list? action) (= (first action) '$))
+        (second action)
+        `(force ~action)))
+
+(defmacro $
+    [expr]
+    `(delay ~expr))
+
 (defmacro caseof
     [args & rules]
     (let [row-action-pairs  (partition 2 rules)
@@ -175,7 +189,7 @@
           filtered-rows     (filter-rows rows)
           transposed-rows   (apply map vector filtered-rows)
           need-force        (map #(some lazy-condition? %) transposed-rows)
-          new-args          (map #(if %1 (gensym) %2) need-force args)
+          new-args          (map #(if %1 (gensym "forced-") %2) need-force args)
           local-bindings    (create-local-bindings args new-args)
           transformed-rows  (map transform-row rows)
           transformed-rules (interleave transformed-rows actions)]
@@ -183,25 +197,17 @@
              (match ~(vec new-args)
                     ~@transformed-rules))))
 
-(defmacro $
-    [expr]
-    `(delay ~expr))
-
 (defmacro defun
     [name args & rules]
-    `(defn ~name ~args
-         (caseof ~args
-                 ~@rules)))
-
-(defn- force-or-remove-delay
-    [action]
-    (if (and (list? action) (= (first action) '$))
-        (second action)
-        `(force ~action)))
+    (let [args (make-args-from-rules rules)]
+        `(defn ~name ~args
+             (caseof ~args
+                     ~@rules))))
 
 (defmacro defunlazy
     [name args & rules]
-    (let [row-action-pairs    (partition 2 rules)
+    (let [args                (make-args-from-rules rules)
+          row-action-pairs    (partition 2 rules)
           rows                (map first row-action-pairs)
           actions             (map second row-action-pairs)
           transformed-actions (map force-or-remove-delay actions)
