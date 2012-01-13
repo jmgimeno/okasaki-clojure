@@ -116,10 +116,6 @@
     [factory]
     (first (:arglists (meta (resolve factory)))))
 
-(defn- filter-rows
-    [rows]
-    (filter #(not= :else %) rows))
-
 (defn- transform-constant
     [constant]
     (keyword (subs (str (resolve constant)) 2)))
@@ -154,11 +150,32 @@
           (as-expr? condition) (transform-as condition)
           :else                 condition))
 
+(def else-row? (partial = :else))
+
+(defn- or-row?
+    [row]
+    (and (list? row)
+         (= :or (first row))))
+
+(defn- transform-regular
+    [row]
+    (vec (map transform-condition row)))
+
+(defn- transform-or
+    [row]
+    (list* :or (map transform-regular (rest row))))
+
 (defn- transform-row
     [row]
-    (if (= row :else)
-        row
-        (vec (map transform-condition row))))
+    (cond (else-row? row) row
+          (or-row? row)   [(transform-or row)]
+          :else           [(transform-regular row)]))
+
+(defn- accumulate-row
+    [row]
+    (cond (else-row? row) nil
+          (or-row? row)   (rest row)
+          :else           [row]))
 
 (defn- create-local-bindings
     [args new-args]
@@ -169,7 +186,11 @@
 
 (defn- make-args-from-rules
     [rules]
-    (-> rules first count (take (repeatedly #(gensym "defun-"))) vec))
+    (let [first-row (first rules)
+          row (if (or-row? first-row)
+                  (second first-row)
+                  first-row)]
+        (-> row count (take (repeatedly #(gensym "defun-"))) vec)))
 
 (defn- force-or-remove-delay
     [action]
@@ -186,15 +207,15 @@
     (let [row-action-pairs  (partition 2 rules)
           rows              (map first row-action-pairs)
           actions           (map second row-action-pairs)
-          filtered-rows     (filter-rows rows)
-          transposed-rows   (apply map vector filtered-rows)
+          accumulated-rows  (mapcat accumulate-row rows) 
+          transposed-rows   (apply map vector accumulated-rows)
           need-force        (map #(some lazy-condition? %) transposed-rows)
           new-args          (map #(if %1 (gensym "forced-") %2) need-force args)
           local-bindings    (create-local-bindings args new-args)
           transformed-rows  (map transform-row rows)
           transformed-rules (interleave transformed-rows actions)]
         `(let [~@(create-local-bindings args new-args)]
-             (match ~(vec new-args)
+             (match [~(vec new-args)]
                     ~@transformed-rules))))
 
 (defmacro defun
