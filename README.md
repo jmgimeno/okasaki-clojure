@@ -8,7 +8,7 @@ I'm trying to follow _almost directly_ the ML implementations using some sugar o
 
 This _sugar_ is defined in namespace datatype.core.
 
-## `defdatatype`
+## defdatatype
 
 A datatype contains an object to name it, and a group of constructors
 with or without parameters.
@@ -32,7 +32,7 @@ not have conficts among different constructors using the same names.
 For instance, in the example, fields are named `node-left`,
 `node-root` and `node-right`.
   
-## `defun`
+## defun
 
 We can now define  _functions_ using pairs of patterns and actions:
 
@@ -71,9 +71,9 @@ besides its parts. For instance:
                 (< y x) (->Node a y (insert x b))
                 :else  t))
 
-## `caseof`
+## caseof
 
-We can also define conditional code using patterns by means of the `caseof
+We can also define conditional code using patterns by means of the `caseof`
 macro:
 
     (caseof [t]
@@ -96,7 +96,7 @@ For instance, we can define Streams as delayed StreamCells and define:
         [n ($ Nil)] ($ Nil)
         [n ($ [Cons x s])] (recur (dec n) s))
 
-## `defunlazy`
+## defunlazy
 
 In order to simplify the construction of lazy-functions (which return delayed objects) we have defined the 
 _equivalent_ macro using the definition given in the book:
@@ -142,7 +142,7 @@ Using it we can define a function that returns the infinite stream of naturals
         ([]  (nats 0))
         ([n] (->Cons n (nats (inc n)))))
           
-### `deflazy`
+### deflazy
 
 When we want to define all the constructors of a datatype as lazy, we
 can use deflazy as a shortcut.
