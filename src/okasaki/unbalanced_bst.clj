@@ -7,7 +7,7 @@
     (Node left root right))
     
 (defun insert
-    [elem tree]
+    ;;[elem tree]
     [x Empty] 
         (->Node Empty x Empty)
     [x ([Node a y b] :as t)]
@@ -17,7 +17,7 @@
             :else   t))
 
 (defun member
-    [elem tree]
+    ;;[elem tree]
     [_ Empty]
         false
     [x [Node a y b]]

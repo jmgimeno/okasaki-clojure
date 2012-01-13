@@ -79,7 +79,7 @@
     number)
 
 (defun plus1
-    [x y]
+    ;;[x y]
     [($ m) ($ n)] ($ (+ m n)))
 
 (deftest plus1-evals-when-applied
@@ -92,7 +92,7 @@
         (is (= 2 @num-evals))))
 
 (defunlazy plus2
-    [x y]
+    ;;[x y]
     [($ m) ($ n)] ($ (+ m n)))
 
 (deftest plus1-evals-when-evaluated

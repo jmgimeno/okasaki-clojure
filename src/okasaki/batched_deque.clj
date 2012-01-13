@@ -12,7 +12,7 @@
 (def Empty (->Quad 0 Nil 0 Nil))
 
 (defun empty?
-    [queue]
+    ;;[queue]
     [[Quad 0 Nil 0 Nil]] true
     :else                false)
 
@@ -25,7 +25,7 @@
         [ntop top nbottom bottom]))
 
 (defun ^:private checkf
-    [queue]
+    ;;[queue]
     [([Quad 0 Nil cr r] :as q)] (if (> cr 1)
                             (let [[cnr nr cnf nf] (split-and-reverse-bottom cr r)]
                                 (->Quad cnf nf cnr nr))
@@ -37,33 +37,33 @@
     [q] q)
 
 (defun cons
-    [elem deque]
+    ;;[elem deque]
     [x [Quad cf f cr r]] (checkf (->Quad (inc cf) (->Cons x f) cr r)))
 
 (defun head
-    [queue]
+    ;;[queue]
     [[Quad 0 Nil 0 Nil]]          (throw (IllegalStateException. "Attempting head of an empty queue"))
     [[Quad _ [Cons h _] _ _]]     h
     [[Quad 0 Nil 1 [Cons h Nil]]] h)
 
 (defun tail
-    [queue]
+    ;;[queue]
     [[Quad 0 Nil 0 Nil]]        (throw (IllegalStateException. "Attempting tail of an empty queue"))
     [[Quad c [Cons h t] cr r]]  (checkf (->Quad (dec c) t cr r))
     [[Quad 0 Nil c [Cons h t]]] (checkf (->Quad 0 Nil (dec c) t)))
 
 (defun snoc
-    [elem queue]
+    ;;[elem queue]
     [x [Quad cf f cr r]] (checkf (->Quad cf f (inc cr) (->Cons x r))))
 
 (defun last
-    [queue]
+    ;;[queue]
     [[Quad 0 Nil 0 Nil]]          (throw (IllegalStateException. "Attempting last of an empty queue"))
     [[Quad _ _ _ [Cons h t]]]     h
     [[Quad 1 [Cons h Nil] 0 Nil]] h)
 
 (defun init
-    [queue]
+    ;;[queue]
     [[Quad 0 Nil 0 Nil]]        (throw (IllegalStateException. "Attempting init of an empty queue"))
     [[Quad cf f cr [Cons h t]]] (checkf (->Quad cf f (dec cr) t))
     [[Quad c [Cons h t] 0 Nil]] (checkf (->Quad (dec c) t 0 Nil)))

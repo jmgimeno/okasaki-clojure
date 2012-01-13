@@ -7,21 +7,21 @@
     (^:datatype.core/lazy Cons first rest))
 
 (defun s-first
-    [stream]
+    ;;[stream]
     [[Cons x _]] x)
 
 (defun s-rest
-    [stream]
+    ;;[stream]
     [[Cons _ r]] r)
 
 (defun s-take
-    [number stream]
+    ;;[number stream]
     [0 s]          s
     [_ Nil]        Nil
     [n [Cons x s]] (->Cons x (s-take (dec n) s)))
 
 (defun s-drop
-    [number stream]
+    ;;[number stream]
     [0 s]          s
     [_ Nil]        Nil
     [n [Cons _ s]] (recur (dec n) s))

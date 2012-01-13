@@ -12,14 +12,14 @@
     (Node color left root right))
 
 (defun member
-    [elem tree]
+    ;;[elem tree]
     [_ Empty] false
     [x [Node _ a y b]] (cond (< x y) (recur x a)
                              (> x y) (recur x b)
                              :else true))
 
-(defun balance
-    [color tree1 elem tree2]
+(defun ^:private balance
+    ;;[color tree1 elem tree2]
     [Black [Node Red [Node Red a x b] y c] z d] (->Node Red (->Node Black a x b) y (->Node Black c z d))
     [Black [Node Red a x [Node Red b y c]] z d] (->Node Red (->Node Black a x b) y (->Node Black c z d))
     [Black a x [Node Red [Node Red b y c] z d]] (->Node Red (->Node Black a x b) y (->Node Black c z d))

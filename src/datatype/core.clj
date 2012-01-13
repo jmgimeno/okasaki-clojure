@@ -198,14 +198,14 @@
                     ~@transformed-rules))))
 
 (defmacro defun
-    [name args & rules]
+    [name & rules]
     (let [args (make-args-from-rules rules)]
         `(defn ~name ~args
              (caseof ~args
                      ~@rules))))
 
 (defmacro defunlazy
-    [name args & rules]
+    [name & rules]
     (let [args                (make-args-from-rules rules)
           row-action-pairs    (partition 2 rules)
           rows                (map first row-action-pairs)

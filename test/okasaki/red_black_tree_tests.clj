@@ -23,10 +23,11 @@
         (is (member 50 rbt))
         (is (not (member 1000 rbt)))))
 
-(defun all-color-paths [tree]
-          [Empty] [[]]
-          [[Node c l x r]] (let [ps (into (all-color-paths l) (all-color-paths r))]
-                               (map #(conj % c) ps)))
+(defun all-color-paths
+    ;;[tree]
+    [Empty] [[]]
+    [[Node c l x r]] (let [ps (into (all-color-paths l) (all-color-paths r))]
+                         (map #(conj % c) ps)))
 
 (deftest no-red-node-has-a-red-child
     (is (->> (range 100)

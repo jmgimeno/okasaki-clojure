@@ -20,16 +20,20 @@ For instance, a _datatype_ for unbalanced binary search trees can be defined as:
         Empty        
         (Node left root right)) 
 
-* _Constant constructors_ are represented as symbols bound to the corresponding keyword (e.g. Empty to :Empty) 
+* _Constant constructors_ are represented as symbols bound to the
+corresponding keyword (e.g. Empty to :user/Empty) 
 both in the current namespace.
 
-* _Factory constructors_ are represented as records with the same name as given  and corresponding fields. Field names are magled in order to not have conficts among different constructors using the same names. For instance, in the example, fields are named node-left, node-root and node-right.
+* _Factory constructors_ are represented as records with the same name
+as given  and corresponding fields. Field names are magled in order to
+not have conficts among different constructors using the same names.
+For instance, in the example, fields are named node-left, node-root and node-right.
   
 ## defun
 
 We can now define  _functions_ using pairs of patterns and actions:
 
-    (defun insert [x t]
+    (defun insert
         [x Empty] 
             (Node Empty x Empty)
         [x [Node a y b]]
@@ -38,7 +42,7 @@ We can now define  _functions_ using pairs of patterns and actions:
                 (< y x) (->Node a y (insert x b))
                 :else    t))
 
-    (defun member [x t]
+    (defun member
         [_ Empty]
             false
         [x [Node a y b]]
@@ -47,8 +51,8 @@ We can now define  _functions_ using pairs of patterns and actions:
                 (< y x) (recur x b)
                 :else   true))
 
-As _factory constructors_ are defined as records, we can use ->Node,
-:node-left, :node-root, :node-right on the actions.
+As _factory constructors_ are defined as records, we can use `->Node`,
+`:node-left`, `:node-root`, `:node-right` on the actions.
 
 ## caseof
 
@@ -61,18 +65,19 @@ macro:
 
 ## $-notation
 
-In chapter 4 of the book $-notation is presented to allow lazy-evaluation. We have defined symbol $ with two 
+In chapter 4 of the book $-notation is presented to allow
+lazy-evaluation. We have defined symbol `$ with two 
 complementary meanings, depending on the side of the rule where it appears:
 
-* When used in the _action_ part of the rule ($ expr) is completely equivalent to (delay expr)
-* In a pattern, we have that ($ pattern) matched expr when pattern matches (force expr)
+* When used in the _action_ part of the rule `($ expr)` is completely equivalent to `(delay expr)`
+* In a pattern, we have that `($ pattern)` matched expr when pattern matches `(force expr)`
 
 For instance, we can define Streams as delayed StreamCells and define:
 
-    (defun s-drop_ [number stream]
-           [0 s] s
-           [n ($ Nil)] ($ Nil)
-           [n ($ [Cons x s])] (recur (dec n) s))
+    (defun s-drop_
+        [0 s] s
+        [n ($ Nil)] ($ Nil)
+        [n ($ [Cons x s])] (recur (dec n) s))
 
 ### defunlazy
 
@@ -87,9 +92,9 @@ is equivalent to
 
 For instance, we can define now:
 
-    (defunlazy s-append [stream1 stream2]
-               [($ Nil)        t] t
-               [($ [Cons x s]) t] ($ (->Cons x (s-append s t))))
+    (defunlazy s-append
+        [($ Nil)        t] t
+        [($ [Cons x s]) t] ($ (->Cons x (s-append s t))))
 
 and the streams are not evaluated when applied but when accessed.
 
@@ -117,8 +122,8 @@ which would define the Cons constructor to be lazy.
 Using it we can define a function that returns the infinite stream of naturals
 
     (defn nats
-          ([]  (nats 0))
-          ([n] (->Cons n (nats (inc n)))))
+        ([]  (nats 0))
+        ([n] (->Cons n (nats (inc n)))))
           
 #### deflazy
 
@@ -132,4 +137,4 @@ can use deflazy as a shortcut.
 
 and now both constructors would be defined as lazy.
 
-#### (c) Juan Manuel Gimeno Illa
+_(c) Juan Manuel Gimeno Illa_

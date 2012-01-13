@@ -10,26 +10,26 @@
 (def Empty (->Pair Nil Nil))
 
 (defun empty?
-    [queue]
+    ;;[queue]
     [[Pair Nil _]] true
     :else          false)
 
 (defun checkf
-    [queue]
+    ;;[queue]
     [[Pair Nil r]] (->Pair (rev r) Nil)
     [q]            q)
 
 (defun snoc
-    [queue elem]
+    ;;[queue elem]
     [[Pair f r] x] (checkf (->Pair f (->Cons x r))))
 
 (defun head
-    [queue]
+    ;;[queue]
     [[Pair Nil _]]        (throw (IllegalStateException. "Attempting head of an empty queue"))
     [[Pair [Cons x _] _]] x)
 
 (defun tail
-    [queue]
+    ;;[queue]
     [[Pair Nil _]]        (throw (IllegalStateException. "Attempting head of an empty queue"))
     [[Pair [Cons _ f] r]] (checkf (->Pair f r)))
 
