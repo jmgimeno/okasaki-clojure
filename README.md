@@ -70,6 +70,21 @@ besides its parts. For instance:
                 (< x y) (->Node (insert x a) y b)
                 (< y x) (->Node a y (insert x b))
                 :else  t))
+                
+### or-patterns
+
+We can define _or-patterns_ to group conditions that correspond to the
+same action. They only work at the topmost level of a condition. For
+instance:
+
+    (defun ^:private balance
+        (:or [Black [Node Red [Node Red a x b] y c] z d] 
+              [Black [Node Red a x [Node Red b y c]] z d] 
+              [Black a x [Node Red [Node Red b y c] z d]] 
+              [Black a x [Node Red b y [Node Red c z d]]]) 
+                  (->Node Red (->Node Black a x b) y (->Node Black c z d))
+        [c a x b]                                         
+                  (->Node c a x b))
 
 ## caseof
 
