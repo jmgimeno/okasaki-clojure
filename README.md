@@ -79,9 +79,9 @@ instance:
 
     (defun ^:private balance
         (:or [Black [Node Red [Node Red a x b] y c] z d] 
-              [Black [Node Red a x [Node Red b y c]] z d] 
-              [Black a x [Node Red [Node Red b y c] z d]] 
-              [Black a x [Node Red b y [Node Red c z d]]]) 
+             [Black [Node Red a x [Node Red b y c]] z d] 
+             [Black a x [Node Red [Node Red b y c] z d]] 
+             [Black a x [Node Red b y [Node Red c z d]]]) 
                   (->Node Red (->Node Black a x b) y (->Node Black c z d))
         [c a x b]                                         
                   (->Node c a x b))
