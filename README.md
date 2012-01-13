@@ -19,15 +19,18 @@ For instance, a _datatype_ for unbalanced binary search trees can be defined as:
         ::UnbalancedBST
         Empty        
         (Node left root right)) 
+        
+Two kinds of _constructors_ are possible: 
 
-* _Constant constructors_ are represented as symbols bound to the
+* _Constants_, which are represented as symbols bound to the
 corresponding keyword (e.g. Empty to :user/Empty) 
 both in the current namespace.
 
-* _Factory constructors_ are represented as records with the same name
-as given  and corresponding fields. Field names are magled in order to
+* _Factories_, which are represented as records with the same name
+as given  and corresponding fields. Field names are mangled in order to
 not have conficts among different constructors using the same names.
-For instance, in the example, fields are named node-left, node-root and node-right.
+For instance, in the example, fields are named `node-left`,
+`node-root` and `node-right`.
   
 ## defun
 
@@ -54,6 +57,20 @@ We can now define  _functions_ using pairs of patterns and actions:
 As _factory constructors_ are defined as records, we can use `->Node`,
 `:node-left`, `:node-root`, `:node-right` on the actions.
 
+### as-patterns
+
+A special _as-pattern_ allows capturing the whole value of a parameter
+besides its parts. For instance:
+
+    (defun insert
+        [x Empty] 
+            (->Node Empty x Empty)
+        [x ([Node a y b] :as t)]
+            (cond 
+                (< x y) (->Node (insert x a) y b)
+                (< y x) (->Node a y (insert x b))
+                :else   t))
+
 ## caseof
 
 We can also define conditional code using patterns by means of the caseof
@@ -79,7 +96,7 @@ For instance, we can define Streams as delayed StreamCells and define:
         [n ($ Nil)] ($ Nil)
         [n ($ [Cons x s])] (recur (dec n) s))
 
-### defunlazy
+## defunlazy
 
 In order to simplify the construction of lazy-functions (which return delayed objects) we have defined the 
 _equivalent_ macro using the definition given in the book:
@@ -125,7 +142,7 @@ Using it we can define a function that returns the infinite stream of naturals
         ([]  (nats 0))
         ([n] (->Cons n (nats (inc n)))))
           
-#### deflazy
+### deflazy
 
 When we want to define all the constructors of a datatype as lazy, we
 can use deflazy as a shortcut.
