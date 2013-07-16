@@ -1,9 +1,4 @@
-.cake
-pom.xml
-*.jar
-*.war
-lib
-classes
-build
-/okasaki
-*~
+.idea
+.lein-failures
+okasaki.iml
+target
