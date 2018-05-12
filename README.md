@@ -15,11 +15,15 @@ with or without parameters.
 
 For instance, a _datatype_ for unbalanced binary search trees can be defined as:
 
-    (defdatatype
-        ::UnbalancedBST
-        Empty        
-        (Node left root right)) 
-        
+```clojure
+
+(defdatatype
+  ::UnbalancedBST
+  Empty        
+  (Node left root right)) 
+
+```
+
 Two kinds of _constructors_ are possible: 
 
 * _Constants_, which are represented as symbols bound to the
@@ -36,23 +40,27 @@ For instance, in the example, fields are named `node-left`,
 
 We can now define  _functions_ using pairs of patterns and actions:
 
-    (defun insert
-        [x Empty] 
-            (->Node Empty x Empty)
-        [x [Node a y b]]
-            (cond 
-                (< x y) (->Node (insert x a) y b)
-                (< y x) (->Node a y (insert x b))
-                :else    t))
+```clojure
 
-    (defun member
-        [_ Empty]
-            false
-        [x [Node a y b]]
-            (cond
-                (< x y) (recur x a)
-                (< y x) (recur x b)
-                :else   true))
+(defun insert
+    [x Empty] 
+        (->Node Empty x Empty)
+    [x [Node a y b]]
+        (cond 
+            (< x y) (->Node (insert x a) y b)
+            (< y x) (->Node a y (insert x b))
+            :else    t))
+
+(defun member
+    [_ Empty]
+        false
+    [x [Node a y b]]
+        (cond
+            (< x y) (recur x a)
+            (< y x) (recur x b)
+            :else   true))
+
+```
 
 As _factory constructors_ are defined as records, we can use `->Node`,
 `:node-left`, `:node-root`, `:node-right` on the actions.
@@ -62,14 +70,18 @@ As _factory constructors_ are defined as records, we can use `->Node`,
 A special _as-pattern_ allows capturing the whole value of a parameter
 besides its parts. For instance:
 
-    (defun insert
-        [x Empty] 
-            (->Node Empty x Empty)
-        [x ([Node a y b] :as t)]
-            (cond 
-                (< x y) (->Node (insert x a) y b)
-                (< y x) (->Node a y (insert x b))
-                :else  t))
+```clojure
+
+(defun insert
+    [x Empty] 
+        (->Node Empty x Empty)
+    [x ([Node a y b] :as t)]
+        (cond 
+            (< x y) (->Node (insert x a) y b)
+            (< y x) (->Node a y (insert x b))
+            :else  t))
+            
+```                
                 
 ### or-patterns
 
@@ -77,23 +89,31 @@ We can define _or-patterns_ to group conditions that correspond to the
 same action. They only work at the topmost level of a condition. For
 instance:
 
-    (defun ^:private balance
-        (:or [Black [Node Red [Node Red a x b] y c] z d] 
-             [Black [Node Red a x [Node Red b y c]] z d] 
-             [Black a x [Node Red [Node Red b y c] z d]] 
-             [Black a x [Node Red b y [Node Red c z d]]]) 
-                  (->Node Red (->Node Black a x b) y (->Node Black c z d))
-        [c a x b]                                         
-                  (->Node c a x b))
+```clojure
+
+(defun ^:private balance
+    (:or [Black [Node Red [Node Red a x b] y c] z d] 
+         [Black [Node Red a x [Node Red b y c]] z d] 
+         [Black a x [Node Red [Node Red b y c] z d]] 
+         [Black a x [Node Red b y [Node Red c z d]]]) 
+              (->Node Red (->Node Black a x b) y (->Node Black c z d))
+    [c a x b]                                         
+              (->Node c a x b))
+
+```
 
 ## caseof
 
 We can also define conditional code using patterns by means of the `caseof`
 macro:
 
-    (caseof [t]
-        [Empty] true
-        [[Node _ _ _]] false)
+```clojure
+
+(caseof [t]
+    [Empty] true
+    [[Node _ _ _]] false)
+
+```
 
 ## $-notation
 
@@ -106,10 +126,14 @@ complementary meanings, depending on the side of the rule where it appears:
 
 For instance, we can define Streams as delayed StreamCells and define:
 
-    (defun s-drop_
-        [0 s] s
-        [n ($ Nil)] ($ Nil)
-        [n ($ [Cons x s])] (recur (dec n) s))
+```clojure
+
+(defun s-drop_
+    [0 s] s
+    [n ($ Nil)] ($ Nil)
+    [n ($ [Cons x s])] (recur (dec n) s))
+
+```
 
 ## defunlazy
 
@@ -124,9 +148,13 @@ is equivalent to
 
 For instance, we can define now:
 
-    (defunlazy s-append
-        [($ Nil) t] t
-        [($ [Cons x s]) t] ($ (->Cons x (s-append s t))))
+```clojure
+
+(defunlazy s-append
+   [($ Nil) t] t
+   [($ [Cons x s]) t] ($ (->Cons x (s-append s t))))
+
+```
 
 and the streams are not evaluated when applied but when accessed.
 
@@ -144,28 +172,40 @@ as true with it.
 
 For instance, we can define the Streams type as
 
-    (defdatatype
-        ::Streams
-        Nil
-        (^:datatype.core/lazy Cons elem stream))
+```clojure
+
+(defdatatype
+   ::Streams
+   Nil
+   (^:datatype.core/lazy Cons elem stream))
+
+```
 
 which would define the Cons constructor to be lazy.
 
 Using it we can define a function that returns the infinite stream of naturals
 
-    (defn nats
-        ([]  (nats 0))
-        ([n] (->Cons n (nats (inc n)))))
+```clojure
+
+(defn nats
+    ([]  (nats 0))
+    ([n] (->Cons n (nats (inc n)))))
           
+```
+
 ### deflazy
 
 When we want to define all the constructors of a datatype as lazy, we
 can use deflazy as a shortcut.
 
-    (deflazy
-        ::Streams
-        Nil
-        (Cons elem stream))
+```clojure
+
+(deflazy
+    ::Streams
+    Nil
+    (Cons elem stream))
+
+```
 
 and now both constructors would be defined as lazy.
 
